@@ -541,7 +541,7 @@ kubectl logs <pod-name>
 ```
 Based on the issue, I take action:
 
-9.explain about blue green deployment strategy 
+### explain about blue green deployment strategy 
 Its a powerful pattern for zero-downtime deployment strategy where you maintain two identical environments:
 `Blue`: The current live/production environment
 `Green`: The new version of the application
@@ -1352,7 +1352,7 @@ Ping/telnet won't make sense since networking side is fine
 Clearing cache/cookies from browser for stale enteries
 Do nslookup for dns resolution if that works fine
 Check SSL certificate if it has gone corrupt and is working fine
-Lack of memory on the web app server due to which it is failing to load the resources for the app```
+Lack of memory on the web app server due to which it is failing to load the resources for the app
 
 ---
 
@@ -1417,7 +1417,7 @@ Exp-4-5 Yrs
 Role: Principal SRE
 
 1) What is observability architecture? Can you explain it?- notAnswered
-2) What is DNS? When you type google.com. What exactly happening in the background?
+2) 
 3) What is the difference between observability
 and monitoring?
 4) When we have logs, why we need trace?
@@ -1673,9 +1673,9 @@ These components work together to control network access to and from pods.
 Company:Hexaware 
 Exp--4-5yrs 
 
- ### .write yaml pipeline for ci/cd (overall structure) 
+### .write yaml pipeline for ci/cd (overall structure) 
 
- 2.what is the command for auto approval in terraform 
+### what is the command for auto approval in terraform 
  ```bash
  terraform apply -auto-approve
 ```
@@ -1728,7 +1728,7 @@ stage('Approval') {
  ### have you written any automation scripts in your daily tasks-notAnswered
  ### how do you moved the code from one environment to other environment-notAnswered
  
- 14.what are the files available inside helm chart
+### what are the files available inside helm chart
 A Helm chart is a structured directory that contains a set of files and folders used to define, configure, and deploy Kubernetes applications.
 These files help Helm template and render Kubernetes manifests dynamically based on user input.
 
@@ -1794,7 +1794,7 @@ How to kill the running process
 States of Linux machine
 When you type google.com, what will happen at backend in browser 
 When you type TOP command, what are the components will be displayed
-CloudFront 
+
 I've a client and remote machine, how do certs communicate b/w them ?
 How does SSL certs works
 
@@ -1862,7 +1862,7 @@ How does VPC Peering work?
 How does Transit Gateway work and how did you configure it?
 If we connect VPCs to the Transit Gateway, what will you update in the VPC Route Table?
 For all VPCs, will you configure the Transit Gateway attachment with CIDR range?
-What is Route 53?
+What is Route 53? 
 What is WAF (Web Application Firewall) and AAF (Application Access Firewall)?
 What is VPC Flow Logs and how will you track the IPs hitting the VPC?
 How to filter a particular IP from AWS CloudWatch Log Group?
@@ -1927,8 +1927,8 @@ HTTP request header and HTTP Methods,
 10.If thre is an instance we have security group and web application firewall enabled, DDOS attack enabled will it protect from Bot attack.
 There is db I made same entry(Name, Location) through PUT method twice what will happen.,
 Why is PUT request called idempotency in nature. If I made another entry and name is same but location is differnet then what will db store.,
-What happens if I type www.google.com in the background.,
-What is SSL/TLS Handshake.,
+What happens if I type www.google.com in the background.
+What is SSL/TLS Handshake.
 15.What is DNS Resolution. Suppose I have new system with no cache what happens in the background.Step by step process.
 What is K8. Explain the architecture.,
 Can I run POD inside master-node itself?,
@@ -1943,7 +1943,7 @@ If you’re migrating a monolithic application from on-prem to Cloud and the sys
 How will you store all the configurations related to your monolithic app in Cloud,
 What are the observibility needed for app —> Monitoring, Alerting, Logging, Remediation, PD,
 If you’re not allowed to install Filebeat in your worker nodes for logging, then what will be possible option,
-What are the security protocols will be taken into consideration while designing three tier architecture.,
+What are the security protocols will be taken into consideration while designing three tier architecture.
 DB migration, how will you sync the data,
 If DB POD is down, will it affect the data it gets stored,
 How about the sticky session data if POD gets down → Yes the session data will be lost,
@@ -1951,7 +1951,7 @@ What service to use sticky session as an alternative option → redis,
 During a sticky session problem what will be the cause for LB.,
 Do you create clusters in multi regions, is it possible? If yes, then how will you manage them,
 Onboarded trading app into AWS, how will you make sure availability, scalability, security,
-How will you take a back of your entire cluster regulary ?,
+How will you take a back of your entire cluster regulary ?
 Write a python script to list the EC2 instances running in your cloud which has the tag of PROD,
 You have been tasked to create 20 EC2 per account and you been provided with 10 AWS accounts, so totally you need to create 200 EC2 machines, how will connect all these machines. Which service will be used?,
 You need to connect your DB running in private subnet, not using NAT gateway or NAT instance or bastion host, what are the other options,
