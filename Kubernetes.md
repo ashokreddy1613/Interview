@@ -557,14 +557,14 @@ It doesn’t need to talk to other nodes directly — instead, it communicates w
 ### How will you know if a network policy is enabled or not in k8s
 ### What key things should you verify post-upgrade? 
 ### Jenkins pipeline setup Kubernetes If a pod is getting restarted constantly, what steps are you going to follow? 
-For deployment if you get timeout issue,  what kind of api gateway you used? 
+### For deployment if you get timeout issue,  what kind of api gateway you used? 
 ### Purpose of using CNI in K8s
-How to configure Cluster auto-scaling, how to do that
-How will you create HPA
-If there are two clusters running in diff regions, if there is an issue with one cluster, how to shift the traffic to another cluster.
-If you type kubectl get pods, what will happen in the backend.
-How to check the kubectl logs of a POD before it restarted
-Have you deployed any security application on Kubernetes?
-What service to use sticky session as an alternative option → redis,
-During a sticky session problem what will be the cause for LB.,
-Do you create clusters in multi regions, is it possible? If yes, then how will you manage them,
+### How to configure Cluster auto-scaling, how to do that
+### How will you create HPA
+### If there are two clusters running in diff regions, if there is an issue with one cluster, how to shift the traffic to another cluster.
+### If you type kubectl get pods, what will happen in the backend.
+### How to check the kubectl logs of a POD before it restarted
+### Have you deployed any security application on Kubernetes?
+### What service to use sticky session as an alternative option → redis,
+### During a sticky session problem what will be the cause for LB.,
+### Do you create clusters in multi regions, is it possible? If yes, then how will you manage them,
