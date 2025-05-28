@@ -1,5 +1,8 @@
-### git commands used in day to day activities
+# Git Interview Questions and Answers
+
+## Q1: What are the git commands used in day to day activities?
 As a DevOps engineer, I use Git daily for version control, CI/CD workflows, infrastructure automation, and collaboration.
+```bash
 git clone <repo-url>
 git pull origin <branch>
 git checkout -b feature/xyz
@@ -11,71 +14,70 @@ git rebase main
 git status
 git diff
 git log --oneline --graph
+```
 
-### Difference between git rebase and git merge
+## Q2: What is the difference between git rebase and git merge?
 Git merge:
 ```bash
-    git checkout feature
-    git merge main
+git checkout feature
+git merge main
 ```
-    Merges `main` into `feature`, adds a merge commit, and keeps both histories.
+Merges `main` into `feature`, adds a merge commit, and keeps both histories.
 
 Git Rebase:
 ```bash
-    git checkout feature
-    git rebase main
+git checkout feature
+git rebase main
 ```
-    Replays feature commits on top of main, creating a clean linear history.
+Replays feature commits on top of main, creating a clean linear history.
+
 `git merge` is safer and preserves history with a merge commit, making it ideal for shared branches. `git rebase` creates a cleaner, linear history by rewriting commits — perfect for feature branches before merging via pull request. I typically use rebase in local development and merge during collaborative work or CI/CD integration.
 
-### What is the difference between git push --force-with-lease vs --force?
+## Q3: What is the difference between git push --force-with-lease vs --force?
 Both git push --force and git push --force-with-lease are used to forcefully update a remote branch, typically after rewriting history (e.g., rebasing or squashing commits).
 The key difference is safety.
 
 `git push --force`
-    This command blindly overwrites the remote branch, regardless of whether someone else has pushed changes after your last pull.
+This command blindly overwrites the remote branch, regardless of whether someone else has pushed changes after your last pull.
 
-    ⚠️ Risk:
-    It can overwrite others' work if changes were pushed by teammates after your last pull — destructive in team environments.
+⚠️ Risk:
+It can overwrite others' work if changes were pushed by teammates after your last pull — destructive in team environments.
 
 git push --force-with-lease ✅ Recommended
-    This command is safer. It tells Git:
+This command is safer. It tells Git:
 
-    "Only force-push if the remote branch hasn't changed since I last fetched it."
+"Only force-push if the remote branch hasn't changed since I last fetched it."
 
-    If someone else has pushed to the branch after your last fetch/pull, the push fails.
-    Protects you from accidentally deleting someone else’s commits.
-### How can you delete the last 2 git commits?
+If someone else has pushed to the branch after your last fetch/pull, the push fails.
+Protects you from accidentally deleting someone else's commits.
 
-git reset --soft HEAD~2	Deletes commits, keeps changes staged
-git reset HEAD~2	    Deletes commits, keeps changes unstaged
-git reset --hard HEAD~2	Deletes commits and all changes permanently
+## Q4: How can you delete the last 2 git commits?
+```bash
+git reset --soft HEAD~2    # Deletes commits, keeps changes staged
+git reset HEAD~2          # Deletes commits, keeps changes unstaged
+git reset --hard HEAD~2   # Deletes commits and all changes permanently
+```
 
-### Git stash
+## Q5: What is git stash?
 git stash is a Git command used to temporarily save (stash) changes in your working directory that are not yet committed, so you can switch branches or perform other operations without losing your progress.
 
-### difference between git fetch and git pull
-Both git fetch and git pull are used to update your local repository from a remote, but they behave differently
+## Q6: What is the difference between git fetch and git pull?
+Both git fetch and git pull are used to update your local repository from a remote, but they behave differently:
+
 1. git fetch
- git fetch downloads commits, files, and references from the remote, but it does not merge them into your current branch
+   git fetch downloads commits, files, and references from the remote, but it does not merge them into your current branch
+
 2. git pull
-    git pull is essentially git fetch + git merge.
+   git pull is essentially git fetch + git merge.
+   It downloads new commits and immediately tries to merge them into your current branch.
 
-    It downloads new commits and immediately tries to merge them into your current branch.
-
-### Repository Management
-**Q: How and from where to clone repo, is there any local repo you are using and then transferring from local to remote or how?**
-
+## Q7: How and from where to clone repo, is there any local repo you are using and then transferring from local to remote or how?
 In my workflow, I usually clone repositories directly from a remote Git server such as GitHub, GitLab, or Azure Repos, depending on the organization.
 
-### Personal Access Token (PAT)
-**Q: What is PAT?**
-
+## Q8: What is PAT (Personal Access Token)?
 PAT (Personal Access Token) is a secure, token-based alternative to passwords used to authenticate with Git hosting platforms like GitHub, GitLab etc.
 
-### Merge Conflict Resolution
-**Q: How to handle merge conflict in git. If 2 people working on same file and did the commit and got conflict err, in how many ways it can be solved?**
-
+## Q9: How to handle merge conflict in git? If 2 people working on same file and did the commit and got conflict error, in how many ways can it be solved?
 Merge conflicts occur when git can't automatically resolve changes to the same part of file. I usually resolve them manually or using a merge tool, and then staging and committing the resolved file.
 
 There are multiple ways to resolve:
@@ -84,9 +86,7 @@ There are multiple ways to resolve:
 - Merge both manually
 - Use a visual merge tool
 
-### Git Tags
-**Q: What is the use of Git tags?**
-
+## Q10: What is the use of Git tags?
 1. **Marking Releases**
    - Git tags are commonly used to mark stable versions of code
 
@@ -102,9 +102,7 @@ We use tags in our CI/CD pipelines to:
 
 I prefer annotated tags for releases since they include metadata like author and message.
 
-### Git Branching
-**Q: What are the different types of branches in Git?**
-
+## Q11: What are the different types of branches in Git?
 Usually, we have:
 - **Long live branches**:
   - Master/main
@@ -112,4 +110,10 @@ Usually, we have:
 - **Short live branches**:
   - Feature
   - Hotfixes
-How will you resolve the git conflict automatically?
+
+## Q12: How will you resolve the git conflict automatically?
+To resolve git conflicts automatically, you can use:
+1. Git's built-in merge strategies
+2. Automated merge tools
+3. CI/CD pipeline conflict resolution scripts
+4. Git hooks for pre-merge conflict detection
