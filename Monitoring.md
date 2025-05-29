@@ -51,3 +51,5 @@ o create an extension in Grafana, use the plugin development framework to build 
 3) What is the difference between observability
 and monitoring?
 4) When we have logs, why we need trace?
+
+what is prometheus, grafana, promrtheuis setup,  monitoring etc 
