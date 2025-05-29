@@ -257,30 +257,30 @@ In AWS, Security Groups and Network ACLs (NACLs) are both used to control networ
 ` NACLs`, on the other hand, operate at the subnet level. Theya are stateless, so you must explicitly define both inbound and outbound rules for bidirectional communication. NACLs support both allow and deny rules, making them useful for subnet-wide IP blocking or stricker control.
 
 5. How do you configure AWS RDS, and what factors do you consider (size, requirements, etc.)?
-1. Choose the Database Engine
-Options include MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, and Aurora
-2. Instance Size (Compute + Memory)
-    Based on performance requirements:
-    t3/t4 – for dev/test
-    m6g/m5/r5 – for production workloads
-3. Storage Type
-    General Purpose (gp3) – Balanced for most workloads
-    Provisioned IOPS (io1/io2) – For I/O-intensive DBs
-    Magnetic – Legacy, rarely used
-4. High Availability
-Enable Multi-AZ deployment for automatic failover (standby replica in another AZ)
-5. Network Configuration
-    Place RDS in private subnets within a VPC
+    1. Choose the Database Engine
+    Options include MySQL, PostgreSQL, MariaDB, Oracle, SQL Server, and Aurora
+    2. Instance Size (Compute + Memory)
+        Based on performance requirements:
+        t3/t4 – for dev/test
+        m6g/m5/r5 – for production workloads
+    3. Storage Type
+        General Purpose (gp3) – Balanced for most workloads
+        Provisioned IOPS (io1/io2) – For I/O-intensive DBs
+        Magnetic – Legacy, rarely used
+    4. High Availability
+    Enable Multi-AZ deployment for automatic failover (standby replica in another AZ)
+    5. Network Configuration
+        Place RDS in private subnets within a VPC
 
-    Control access using:
-    Security Groups
-    Subnet NACLs
-    IAM policies (for snapshot access)
-6. Backup and Maintenance
-Enable automated backups (retention: 7–35 days)
+        Control access using:
+        Security Groups
+        Subnet NACLs
+        IAM policies (for snapshot access)
+    6. Backup and Maintenance
+    Enable automated backups (retention: 7–35 days)
 
-7. Monitoring and Alerts
-8. Security Considerations
+    7. Monitoring and Alerts
+    8. Security Considerations
     Encrypt at rest with KMS
     Enable SSL in transit
     Restrict access to trusted IPs/VPCs
