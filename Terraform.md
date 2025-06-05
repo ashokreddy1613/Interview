@@ -1042,3 +1042,9 @@ terraform/
 terraform workspace new dev
 terraform workspace new prod
 ```
+## What is the difference between for_each and for in Terraform?
+## Do you have any experience using functions in Terraform? If yes, explain.
+## What are best practices to be followed on terraform
+## Diff between local and variable in Terraform,
+## You created couple of resources using Terraform, how will you make sure that resources are not modified through UI, how will you automate this check
+## terraform structure
