@@ -882,3 +882,26 @@ Yes, it's possible to create and manage multi-region clusters:
    - Set up cross-region replication
    - Implement backup strategies
    - Configure disaster recovery
+
+## Q74 what is cluster auto scaler and horizontal auto scaling
+Cluster Autoscaler works at the infrastructure level, while Horizontal Pod Autoscaler works at the application level.
+
+Cluster Autoscaler
+Purpose: Automatically adds or removes nodes in the cluster.
+
+Triggers:
+Pending pods due to insufficient resources.
+Underutilized nodes that can be scaled down.
+
+Horizontal Pod Autoscaler (HPA)
+Purpose: Automatically scales the number of pod replicas.
+Triggers: Based on metrics like CPU usage, memory, or custom metrics.
+
+## Q75 How will you monitor the cluster through Prometheus
+To monitor a Kubernetes cluster using Prometheus, you deploy a monitoring stack that collects, stores, and visualizes metrics from cluster components, nodes, and applications.
+
+I’d deploy Prometheus with the kube-prometheus-stack, use ServiceMonitor and PodMonitor to collect metrics, visualize data in Grafana, and configure alerts with Alertmanager for proactive monitoring of the cluster, nodes, and applications."
+
+## Q76 What command will you give for view access for the cluster → READ in rolebinding.yaml file
+I would bind the built-in view ClusterRole to the user using a ClusterRoleBinding.
+
