@@ -1,30 +1,26 @@
 # AWS Interview Questions and Answers
 
-## 1. Compute Services
-
-### 1.1 EC2
-1. What are the security parameters we must consider while creating an EC2 instance for production?
+## 1. What are the security parameters we must consider while creating an EC2 instance for production?
    - Using security groups to control traffic
    - Implementing IAM roles
    - Enabling encryption for EBS volumes
    - Regular security updates and patches
    - Monitoring and logging
 
-2. How can you protect the data in an AWS instance?
+## 2. How can you protect the data in an AWS instance?
    - Encrypting data at rest and in transit
    - Restricting access using IAM, SGs, and VPC
    - Using SSM over SSH
    - Monitoring and auditing activity
    - Taking regular, encrypted backups
 
-3. How to login to a VM if it has only a private IP?
+## 3. How to login to a VM if it has only a private IP?
    - Using a bastion host (jump server)
    - Using VPN
    - Using AWS Session Manager (SSM) if SSM Agent is installed
    - Using IAM permissions for secure access
 
-### 1.2 Lambda
-4. What are the limitations of AWS Lambda?
+## 4. What are the limitations of AWS Lambda?
    - Execution Time: Maximum 15 minutes (900 seconds)
    - Memory: 128 MB to 10,240 MB (10 GB)
    - Package Size:
@@ -33,32 +29,29 @@
      - Layer limit: 5 layers, 50 MB each
    - Stateless, no GPU, limited persistent storage
 
-5. How does Lambda work with containers?
+## 5. How does Lambda work with containers?
    - Supports Docker container images up to 10 GB
    - Provides flexibility in dependencies and tooling
    - Allows custom runtime environments
    - Supports multiple programming languages
 
-## 2. Storage Services
-
-### 2.1 S3
-6. What is the purpose of creating S3 bucket policies?
+## 6. What is the purpose of creating S3 bucket policies?
    - Control access to S3 bucket and contents
    - Define who can perform what actions
    - Set conditions for access
    - Manage cross-account access
 
-7. How do you maintain the lifecycle of an S3 bucket?
+## 7. How do you maintain the lifecycle of an S3 bucket?
    -A lifecycle policy defines when and how S3 objects should be: Transitioned to cheaper storage classes (e.g., Glacier) Expired (deleted) after a certain period Noncurrent versions (in versioned buckets) cleaned up
 
-    “I usually start by analyzing the data retention and access patterns. Based on that, I create lifecycle rules which:
+    "I usually start by analyzing the data retention and access patterns. Based on that, I create lifecycle rules which:
         Automatically transition infrequently accessed data to cheaper storage classes like S3 Standard-IA, Glacier, or Deep Archive after a set number of days.
         Expire temporary or outdated objects, for example, logs older than 90 or 180 days.
         If versioning is enabled, I also set rules to delete non-current object versions after a specific period to reduce cost.
 
-I use S3 lifecycle rules to automatically transition data to cheaper storage and delete old or unused files — either by prefix or tag — to optimize costs and meet data retention policies.”
+I use S3 lifecycle rules to automatically transition data to cheaper storage and delete old or unused files — either by prefix or tag — to optimize costs and meet data retention policies."
 
-8. What is the difference between S3 bucket policies and ACLs?
+## 8. What is the difference between S3 bucket policies and ACLs?
    S3 Bucket Policies:
    - JSON-based resource policies
    - Fine-grained access control
@@ -71,8 +64,7 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
    - Limited to specific accounts/groups
    - No complex conditions
 
-### 2.2 EBS
-9. What is the difference between S3 and EBS?
+## 9. What is the difference between S3 and EBS?
    S3:
    - Object-based storage
    - Accessed via API/web
@@ -85,10 +77,7 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
    - Limited size per volume
    - Direct access
 
-## 3. Database Services
-
-### 3.1 RDS
-10. How do you configure AWS RDS, and what factors do you consider?
+## 10. How do you configure AWS RDS, and what factors do you consider?
     1. Database Engine Selection
     2. Instance Size (Compute + Memory)
     3. Storage Type
@@ -98,15 +87,12 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
     7. Monitoring and Alerts
     8. Security Considerations
 
-11. How many masters and slaves are in RDS?
+## 11. How many masters and slaves are in RDS?
     - One primary (master) instance
     - Up to 5 read replicas per master
     - Typical setup: 1 primary + 2 read replicas
 
-## 4. Networking
-
-### 4.1 VPC
-12. What are Network ACLs and Security Groups, and how do they differ?
+## 12. What are Network ACLs and Security Groups, and how do they differ?
     Security Groups:
     - Instance-level firewall
     - Stateful
@@ -117,13 +103,12 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
     - Stateless
     - Allow and deny rules
 
-13. How many NAT Gateways are needed for two public & two private subnets in a single VPC?
+## 13. How many NAT Gateways are needed for two public & two private subnets in a single VPC?
     - Minimum: 1 NAT Gateway
     - Recommended: 2 NAT Gateways (one per AZ)
     - For high availability: 2 NAT Gateways in different AZs
 
-### 4.2 Route 53
-14. What is Route 53 and how do you use it?
+## 14. What is Route 53 and how do you use it?
 
     - Route 53 is a scalable DNS web service that provides domain registration, DNS routing, and health checking.
      1️⃣ DNS Service (Domain Name Resolution) Translates domain names (e.g., www.example.com) into IP addresses (e.g., 192.0.2.1) so that users can access web applications. 
@@ -132,7 +117,7 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
      4️⃣ Health Checks and Failover Route 53 can monitor the health of endpoints using: HTTP/HTTPS/TCP checks Integrated with DNS to failover to healthy endpoints
    
 
-15. Explain TTL in DNS - how does it work?
+## 15. Explain TTL in DNS - how does it work?
     - TTL (Time To Live) defines cache duration
     - Flow:
       1. User requests domain
@@ -141,10 +126,7 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
       4. Caches response for TTL duration
       5. Uses cached value until TTL expires
 
-## 5. Security
-
-### 5.1 IAM
-16. What is the difference between IAM Users and Roles?
+## 16. What is the difference between IAM Users and Roles?
     IAM Users:
     - Permanent identity
     - Long-term credentials
@@ -155,22 +137,19 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
     - No permanent credentials
     - Assumed by users/services
 
-17. What are the best password security practices?
+## 17. What are the best password security practices?
     1. Strong Password Policies
     2. Multi-Factor Authentication (MFA)
     3. No Hardcoded Passwords
     4. Regular Password Rotation
 
-## 6. Monitoring & Observability
-
-### 6.1 CloudWatch
-18. What are the use cases for CloudWatch?
+## 18. What are the use cases for CloudWatch?
     1. Resource Monitoring
     2. Log Collection and Analysis
     3. Real-Time Alerting
     4. Dashboard Visualization
 
-19. How do you implement cost optimization in AWS?
+## 19. How do you implement cost optimization in AWS?
     - Right-sizing instances
     - Using Reserved Instances
     - Implementing auto-scaling
@@ -179,32 +158,24 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
     - Regular resource review
     - Using Cost Explorer
 
-## 7. Container Services
-
-### 7.1 ECS/Fargate
-20. What is AWS Fargate?
+## 20. What is AWS Fargate?
     - Serverless compute engine for containers
     - Works with ECS and EKS
     - No EC2 instance management
     - Automatic resource allocation
 
-## 8. Hybrid Cloud
-
-### 8.1 Storage Gateway
-21. What is AWS Storage Gateway?
+## 21. What is AWS Storage Gateway?
     - Hybrid cloud storage service
     - Connects on-premises to AWS
     - Local caching capability
     - Secure data transfer
 
-## 9. Load Balancing
-
-22. What are the types of load balancers in AWS?
+## 22. What are the types of load balancers in AWS?
     1. Application Load Balancer (ALB)
     2. Network Load Balancer (NLB)
     3. Gateway Load Balancer (GWLB)
 
-23. How does weighted routing work in load balancers?
+## 23. How does weighted routing work in load balancers?
     Weighted routing allows you to distribute traffic to different targets based on assigned weights. This is useful for testing new application versions or gradually shifting traffic.
 
     Where Weighted Routing Is Used: 🔹 1. Route 53 (DNS-Based Weighted Routing) Not a load balancer, but used for routing traffic between resources like:
@@ -217,20 +188,16 @@ I use S3 lifecycle rules to automatically transition data to cheaper storage and
 
     Starting from 2023, ALB supports weighted target groups within the same listener rule.
 
-    “Weighted routing allows us to split traffic between multiple targets based on defined percentages. In Route 53, it works at the DNS level, useful for region-based routing or blue/green deployments. With ALB, weighted target groups allow canary deployments by controlling how much traffic is sent to each version of the application.
+    "Weighted routing allows us to split traffic between multiple targets based on defined percentages. In Route 53, it works at the DNS level, useful for region-based routing or blue/green deployments. With ALB, weighted target groups allow canary deployments by controlling how much traffic is sent to each version of the application.
 
-## 10. Migration & Disaster Recovery
-
-24. How would you approach RDS migration with minimal downtime?
+## 24. How would you approach RDS migration with minimal downtime?
     - Use AWS Database Migration Service
     - Implement replication
     - Perform cutover during low-traffic periods
     - Validate data consistency
     - Monitor performance during migration
 
-## 11. Best Practices
-
-25. How do you implement best security policies on AWS?
+## 25. How do you implement best security policies on AWS?
     1. IAM Best Practices
     2. Data Protection
     3. Network Security
@@ -619,7 +586,7 @@ Implement centralized logging (e.g., FluentBit → ELK or CloudWatch)
 
 
 43. I'm an admin but I don't have access to the S3 bucket ? 
-“Even as an admin, S3 access can be blocked by bucket policies, encryption settings, and Block Public Access. I’d review the bucket policy, check for explicit denies or conditions, use the IAM Policy Simulator, and verify if any KMS key policies or VPC/IP conditions are restricting access.”
+"Even as an admin, S3 access can be blocked by bucket policies, encryption settings, and Block Public Access. I'd review the bucket policy, check for explicit denies or conditions, use the IAM Policy Simulator, and verify if any KMS key policies or VPC/IP conditions are restricting access."
 
 
 44. What are the top 5 infra attacks, and how do you mitigate them?- notAnswered
@@ -740,7 +707,7 @@ To enable outbound traffic, I use a NAT Gateway in a public subnet and route tra
 I implemented application-level security using a layered approach — including authentication, authorization, encryption, input validation, secure headers, and dependency scanning — integrated within CI/CD to enforce security throughout the SDLC."
 
 51. What types of nodes did you deploy in AWS?
-"In AWS, I’ve deployed various types of nodes depending on the workload — including EC2 instances for traditional workloads, EKS worker nodes (managed and Fargate), RDS instances, and auto-scaling groups behind load balancers. I choose instance types and node types based on compute, memory, storage, and scalability requirements."
+"In AWS, I've deployed various types of nodes depending on the workload — including EC2 instances for traditional workloads, EKS worker nodes (managed and Fargate), RDS instances, and auto-scaling groups behind load balancers. I choose instance types and node types based on compute, memory, storage, and scalability requirements."
 
 52. What is the difference between Interface Endpoint and Gateway Endpoint?
 The key difference is that Interface Endpoints use private IPs and Elastic Network Interfaces (ENIs) to connect to AWS services over the VPC network, while Gateway Endpoints update your route tables to route traffic to specific services like S3 and DynamoDB without using NAT or public IPs."
@@ -768,11 +735,11 @@ Copy Route 53 Name Server Records
 Update the domain's nameservers in godaddy
 Create DNS Records in Route 53
 
-“To configure a GoDaddy (or third-party) domain with Route 53, I first create a public hosted zone in Route 53, copy the AWS name servers, and update them in GoDaddy’s DNS settings. Then I create the required A, CNAME, or Alias records in Route 53 to point traffic to my AWS resources like ALB, EC2, or S3 static websites.”
+"To configure a GoDaddy (or third-party) domain with Route 53, I first create a public hosted zone in Route 53, copy the AWS name servers, and update them in GoDaddy's DNS settings. Then I create the required A, CNAME, or Alias records in Route 53 to point traffic to my AWS resources like ALB, EC2, or S3 static websites."
 
 
 56. What is the difference between AWS Config and AWS CloudTrail?
-AWS CloudTrail logs every API call made in your account — including who made it, when, and from where. AWS Config continuously records the configuration state of resources and shows how they’ve changed over time. I use CloudTrail for auditing and security investigations, and AWS Config for compliance monitoring, drift detection, and historical resource tracking.
+AWS CloudTrail logs every API call made in your account — including who made it, when, and from where. AWS Config continuously records the configuration state of resources and shows how they've changed over time. I use CloudTrail for auditing and security investigations, and AWS Config for compliance monitoring, drift detection, and historical resource tracking.
 
 🔍 AWS Config Example Use Cases
     Track if an S3 bucket had public access enabled
@@ -796,7 +763,7 @@ n AWS EKS, there are two main types of node groups: Managed Node Groups and Self
 
 If a user wants to access an S3 bucket, the access depends on who the user is (IAM or external) and how the bucket is configured (private, cross-account, public, etc.).
 
-“To allow a user to access an S3 bucket, I either attach an IAM policy (for same-account users), configure a bucket policy (for cross-account access), or use a pre-signed URL (for temporary access). I ensure that access is secure and follows the principle of least privilege.
+"To allow a user to access an S3 bucket, I either attach an IAM policy (for same-account users), configure a bucket policy (for cross-account access), or use a pre-signed URL (for temporary access). I ensure that access is secure and follows the principle of least privilege.
 
 
 Step 1: Attach an IAM Role to EC2
@@ -842,10 +809,10 @@ Transit Gateway allowed me to simplify VPC-to-VPC communication across multiple 
 62. If we connect VPCs to the Transit Gateway, what will you update in the VPC Route Table?
 When you connect VPCs to a Transit Gateway (TGW), you must update the VPC route tables to route traffic to the Transit Gateway for any destination CIDRs (usually other VPCs or on-prem networks).
 
-“When I attach a VPC to a Transit Gateway, I update the route table in each VPC to point the destination CIDR of peer VPCs to the TGW ID. I also ensure the TGW route table maps the CIDRs to the correct VPC attachments, and that security groups are configured to allow traffic between them.
+"When I attach a VPC to a Transit Gateway, I update the route table in each VPC to point the destination CIDR of peer VPCs to the TGW ID. I also ensure the TGW route table maps the CIDRs to the correct VPC attachments, and that security groups are configured to allow traffic between them."
 
 63. For all VPCs, will you configure the Transit Gateway attachment with CIDR range?
-No, we don’t manually configure CIDR ranges during Transit Gateway attachment. The VPC's CIDR is automatically associated with the attachment. We control routing via the Transit Gateway route table, which maps destination CIDRs to the appropriate VPC attachment. This ensures that each VPC can route traffic to the correct peer via TGW.
+No, we don't manually configure CIDR ranges during Transit Gateway attachment. The VPC's CIDR is automatically associated with the attachment. We control routing via the Transit Gateway route table, which maps destination CIDRs to the appropriate VPC attachment. This ensures that each VPC can route traffic to the correct peer via TGW.
 
 
 65. What is WAF (Web Application Firewall) and AAF (Application Access Firewall)?
@@ -899,23 +866,23 @@ DNS resolution is the process of converting a human-readable domain name (like e
     Your browser (or OS) checks the local DNS cache.
     ✅ Since it's a new system, there's no local cache.
 🌐 Step 2: Request Sent to Recursive Resolver (DNS Client → Resolver)
-    Your system contacts the configured DNS resolver (usually your ISP’s or public one like 8.8.8.8 or 1.1.1.1).
+    Your system contacts the configured DNS resolver (usually your ISP's or public one like 8.8.8.8 or 1.1.1.1).
     This recursive DNS resolver takes responsibility for resolving the name fully and returning the IP.
 
 🧠 Step 3: Query Root Name Server
     The resolver asks a Root DNS server:
-        “Where can I find .com domain names?”
+        "Where can I find .com domain names?"
 
     Root server responds with the address of the TLD server for .com
 🏛️ Step 4: Query TLD (Top-Level Domain) Server
     The resolver asks the .com TLD server:
-    “Where is example.com hosted?”
+    "Where is example.com hosted?"
 
     TLD server responds with the Authoritative Name Server for example.com
 
 🔒 Step 5: Query Authoritative Name Server
     The resolver contacts the authoritative DNS server (e.g., ns1.exampledns.com)
-    “What is the IP address of www.example.com?”
+    "What is the IP address of www.example.com?"
 📦 Step 6: Response Returned to Original Client
     Resolver returns the IP address to your OS
     Your OS provides it to the browser
@@ -939,7 +906,7 @@ I store application configurations in centralized and secure services like AWS S
 - Use IAM + EC2 Instance Connect or AWS Systems Manager
 
 76. You need to connect your DB running in private subnet, not using NAT gateway or NAT instance or bastion host, what are the other options,
-“If I can’t use a NAT Gateway, NAT instance, or bastion host, I’ll use AWS Systems Manager Session Manager to connect to a managed EC2 instance inside the VPC that can access the private DB. I can also use VPC Interface Endpoints, AWS Client VPN, or SSM port forwarding to securely connect to the database without exposing it to the public or depending on traditional network hops.”
+"If I can't use a NAT Gateway, NAT instance, or bastion host, I'll use AWS Systems Manager Session Manager to connect to a managed EC2 instance inside the VPC that can access the private DB. I can also use VPC Interface Endpoints, AWS Client VPN, or SSM port forwarding to securely connect to the database without exposing it to the public or depending on traditional network hops."
 
 77. what is tcp and udp
 TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are two core protocols of the transport layer in the TCP/IP model. They are used to send data between devices over a network, but they work differently in terms of reliability, speed, and connection."
@@ -1001,7 +968,7 @@ Steps to send logs from EC2 to S3:
     1.🌐 A NAT Gateway in a public subnet
     2. 🗺️ Route tables configured to route traffic from the private subnet to the NAT Gateway
 
-    “To connect a private subnet to the internet, I create a NAT Gateway in a public subnet and update the private subnet's route table to forward internet-bound traffic through the NAT. This allows outbound internet access while keeping the subnet private. For more control, a NAT instance can also be used, but NAT Gateway is preferred for scalability and maintenance.”
+    "To connect a private subnet to the internet, I create a NAT Gateway in a public subnet and update the private subnet's route table to forward internet-bound traffic through the NAT. This allows outbound internet access while keeping the subnet private. For more control, a NAT instance can also be used, but NAT Gateway is preferred for scalability and maintenance."
 
 87. Design HA backend using AWS services.
 For a highly available backend, use:

@@ -126,6 +126,9 @@ A scraper is an automated tool that extracts data from websites or APIs, commonl
 ## have you written any automation scripts in your daily tasks-notAnswered
 
 ## How would you structure disaster recovery for your applciation?
+
+Disaster Recovery (DR) is a strategy and set of processes to ensure that your systems and data can be recovered quickly and reliably after a catastrophic failure — such as data loss, infrastructure failure, region outage, or cyberattack.
+
 I structure disaster recovery by first defining RTO/RPO, then architecting for fault tolerance using multi-AZ and cross-region strategies. I use automated backups, cross-region replication, Route 53 failover, and infrastructure-as-code to ensure fast recovery. I also run regular failover tests to validate that recovery plans are effective.
 
 ✅ 2. Application Layer Resilience

@@ -361,3 +361,8 @@ Yes, I have implemented several automation solutions:
    - Automated testing
    - Zero-downtime deployments
    - Rollback procedures 
+
+## Write a shell script to find and delete all files in a directory that are older than 30 days.
+## Create a script to monitor the disk usage of a server. If usage exceeds 80%, log the details to a file and send an alert email.
+## Write a script that renames all .txt files in a directory by appending the current date to the filename.
+## have you written any automation scripts in your daily tasks 
