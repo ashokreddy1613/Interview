@@ -905,3 +905,323 @@ I’d deploy Prometheus with the kube-prometheus-stack, use ServiceMonitor and P
 ## Q76 What command will you give for view access for the cluster → READ in rolebinding.yaml file
 I would bind the built-in view ClusterRole to the user using a ClusterRoleBinding.
 
+# Troubleshoot 
+
+## In Kubernetes, if a pod is in a pending state, how do you troubleshoot?
+If a pod is stuck in Pending state in Kubernetes, it means it cannot be scheduled onto a node — usually due to resource, scheduling, or configuration issues.
+
+1. check pod status in details
+kubectl describe pod <pod-name> -n <namespace>
+Focus on the "Events" section at the bottom — it often tells you why the pod isn't being scheduled.
+
+2. Check Node Availability
+Make sure you have ready nodes to schedule pods:
+
+3. Check Resource Requests and Limits
+Pods may request more CPU or memory than any node can provide.
+
+```bash
+kubectl get pod <pod-name> -o yaml
+```
+look for 
+
+```bash
+resources:
+  requests:
+    cpu: "4"
+    memory: "8Gi"
+```
+This could be due to NodeSelectors, tolerations, Affinity rules, taints
+
+## If any pod/node goes down how do you troubleshoot/monitor that( via cluster and other monitoring tools)
+
+1. Detection & Alerting (Monitoring)
+"We use monitoring tools like Prometheus with Alertmanager, or CloudWatch (in EKS), to trigger alerts when a node goes NotReady, or a pod restarts frequently or fails health checks."
+
+Alerts go to Slack, PagerDuty, or email
+
+2. Pod-Level Troubleshooting
+"First, I use kubectl get pods -A to check status. If a pod is stuck in CrashLoopBackOff, I describe it to see why.
+```bash
+kubectl describe pod <pod>
+kubectl logs <pod>
+```
+I check for OOMKilled, image errors, failed probes
+
+3. Node-Level Troubleshooting
+"If a node is NotReady, I describe the node and check for system issues like disk pressure or kubelet failures."
+```bash
+kubectl describe node <node>
+```
+## I am getting the following error, how can I debug that and what does the error mean? Pods fail to schedule , 0/5 nodes are available: insufficient memory.
+1. Inspect the Pod's Resource Request
+"First, I’d check the pod’s YAML or describe output to see how much memory it’s requesting under resources.requests.memory. Sometimes apps are over-provisioned."
+```bash
+kubectl describe pod <pod-name>
+kubectl get pod <pod-name> -o yaml
+```
+2. Check Node Resource Usage
+"Then I'd check actual memory usage on nodes using `kubectl top nodes` if metrics-server is enabled. This tells me how much free memory is left."
+
+I will take action depends on the situation, if pod doesn't that much space I will reduce space, or scale the cluster by scaling node group or add more nodes.
+
+## How do you troubleshoot Imagepull backoff error 
+An ImagePullBackOff means Kubernetes tried to pull a container image for a pod but failed, and is now backing off and retrying
+I describe the pod to get detailed error
+Common issues are:
+wrong images name or tag, private registry authentication, ECR specific issue
+
+## If you pod is not running, how do you troubleshoot it?
+1. Check pod status - ` kubectl get pods -n <namspace>
+"I check whether the pod is in Pending, CrashLoopBackOff, ImagePullBackOff, or Error state. The status gives the first clue."
+
+2. Describe the pod for events
+3. Check pod logs 
+
+Based on what I find, I apply the fix and redeploy.
+
+## what will be your approach if pod.yaml failed
+1. Check If It's a Syntax Error (Before Applying)
+“If the file has invalid YAML, kubectl apply or create will fail immediately.”
+
+2. Check Validation Errors (Kubernetes Schema)
+“If the YAML is syntactically correct but contains invalid Kubernetes fields or values, the API server will reject it.”
+
+## if application which you are trying to deploy with kubernets got crashed and you are not able to enter into pod what will be your approach 
+So if a pod crashes and I can’t get inside, I describe the pod, check logs with --previous, and inspect cluster events for deeper insight. Based on the cause — crash, config error, or resource limits — I fix the manifest or the app and redeploy. I always make sure to use health probes and logging to catch the issue earlier in future releases
+
+##  When you're trying to deploy a POD, it's  throwing an error, how will you investigate.
+1. Validate the YAML Syntax
+“First, I check if the YAML file itself is valid and not malformed
+```bash
+kubectl apply -f pod.yaml
+# or
+yamllint pod.yaml
+```
+2. Use Dry Run to Validate Against the API
+If the syntax is fine, I validate it against the cluster using dry-run.
+```bash
+kubectl apply -f pod.yaml --dry-run=server
+```
+This helps catch schema errors like incorrect field names or missing required fields.
+
+## How to assign memory to pod and how to make sure if pod should not get memory constraint. What to do if it happens.
+
+1. Assigning Memory to a Pod
+“In the pod spec, I define resources.requests.memory and resources.limits.memory to control how much memory the pod gets and can use.”
+
+```bash
+resources:
+  requests:
+    memory: "512Mi"
+  limits:
+    memory: "1Gi"
+```
+`requests`: guaranteed memory allocation (used for scheduling)
+
+`limits`: max memory the pod can use
+
+- To ensure a Kubernetes Pod doesn’t hit memory constraints, you need to both limit overuse and guarantee enough memory I mean set limit above average of usage
+
+2. Enable Liveness & Readiness Probes
+These won't prevent memory crashes but will restart pods gracefully before they get stuck
+```bash
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 10
+  periodSeconds: 15
+```
+if a pod exceeds its memory limit, Kubernetes kills it with an OOMKilled event.
+After resource quota, limit, I will identify which pod is going to down , get to the pod, get thread dump and heap dumbs and share with developers.
+
+## Some pods are evicting due to high cpu usage in cluster? step by step how can you troubleshoot?
+1. Confirm the Reason for Eviction
+```bash
+kubectl get pods -A | grep Evicted
+kubectl describe pod <pod-name> -n <namespace>
+```
+2. Check cpu of usage of nodes 
+```bash
+kubectl get nodes
+kubectl describe node <node-name>
+kubectl top nodes
+
+```
+If CPU Requests or usage is near or over capacity → node pressure is confirmed.
+
+3. identify which pods are consuming more resources
+```bash
+kubectl top pods --all-namespaces
+```
+4. I will apply resource request and limts
+
+## Dns resolution failing,  pods cant communicate with services with dns name, how to trobleshoot?
+f DNS resolution is failing in your Kubernetes cluster — meaning pods can’t resolve service names like my-service.my-namespace.svc.cluster.local
+
+1. Verify the CoreDNS Pods Are Running
+CoreDNS handles DNS in most Kubernetes clusters (like EKS, GKE, self-hosted).
+```bash
+kubectl get pods -n kube-system -l k8s-app=kube-dns
+```
+They should be Running. if not check logs of core-dns pod
+```bash
+kubectl logs -n kube-system <coredns-pod-name>
+```
+Depends on error from logs will process. 
+
+Fianlly, I would restart coreDNS pod
+`kubectl rollout restart deployment coredns -n kube-system`
+
+## You have  services is k8s, you’re not able to access from outside how will you troble shoot?
+when you can’t access a Kubernetes service from outside the cluster, it’s often a networking, service type, or ingress issue.
+
+1. Check the Service Type
+```bash
+kubectl get svc <service-name> -n <namespace>
+```
+✅ Fix: If it's ClusterIP, change to NodePort or LoadBalancer if you need external access.
+
+2. Check for an External IP or Port
+```bash
+kubectl get svc <svc-name>
+```
+If type = LoadBalancer, look for EXTERNAL-IP field
+
+If it says <pending>, cloud load balancer wasn't provisioned
+
+3. Check Ingress Controller (if using Ingress)
+```bash
+kubectl get ingress
+```
+Check does ingress resource exist? does it point to correct service/port? 
+
+Describe ingress to check errors
+```bash
+kubectl describe ingress <name>
+```
+## If k8s running stateful application, how would you ensure high availability?
+So for stateful apps, I use StatefulSets, persistent volumes, pod anti-affinity, and readiness probes to ensure data stability and node-level availability. I also set up backups and distribute workloads across zones to make the system resilient to both node and infrastructure failures."
+
+## You cluster running fine, suddenly some pods are not able to communicate with services?
+1. Confirm the Scope of the Issue
+```bash
+kubectl get pods -A
+kubectl get svc -A
+```
+2. Test DNS Resolution From a Failing Pod
+“I exec into a failing pod and try to resolve the service name.”
+```bash
+kubectl exec -it <pod> -- nslookup <service-name>
+```
+❌ If this fails → likely a CoreDNS issue or DNS config problem.
+
+3. Check if Service Has Healthy Endpoints
+“If the service exists but has no endpoints, the pods behind it may be failing or not matching the selector.”
+```bash
+kubectl get endpoints <service-name> -n <namespace>
+```
+5. Check Network Policies
+“If DNS and endpoints are fine, I check for recent changes to NetworkPolicies that may be blocking inter-pod traffic.”
+```bash
+kubectl get networkpolicy -A
+```
+✅ Fix: Allow egress and ingress rules between pods/services
+
+## After upgrading, some apps failing due APIs deprecated how will you find and solve?
+So when apps fail after a Kubernetes upgrade due to deprecated APIs, I identify the failing resources, scan for deprecated versions using tools like pluto, update to supported APIs, and test changes safely. I also use policy enforcement to prevent this in future upgrades."
+
+## Pvc is not bound issue, how to trouble shoot
+If a PVC (PersistentVolumeClaim) is stuck in "Pending" or not bound, it means Kubernetes couldn't find a matching PersistentVolume (PV) or couldn't provision one dynamically.
+1. Check PVC Status
+```bash
+kubectl get pvc -n <namespace>
+```
+Look for STATUS: Pending
+2. Describe the PVC
+```bash
+kubectl describe pvc <pvc-name> -n <namespace>
+```
+Look at the Events section at the bottom
+3. Check the StorageClass
+PVCs often rely on a StorageClass to dynamically provision PVs.
+```bash
+```
+inspect `kubectl describe sc <storage-class-name>`
+
+## node is not in ready state, what are the steps?
+1. Check Node Status
+```bash
+kubectl get nodes
+```
+2. Describe the Node
+```bash
+kubectl describe node <node-name>
+```
+Look for conditions like:
+   Ready: False
+   DiskPressure, MemoryPressure, PIDPressure: True (resource exhaustion)
+   Events like:
+      NodeNotReady
+      KubeletNotReady
+      Container runtime not responding
+
+Sometimes, a reboot is the fastest fix: `sudo reboot`
+
+## I have an Ingress object that is not routing the traffic to the Kubernetes cluster. What are the reasons and how do you troubleshoot that?
+
+If your Ingress object is not routing traffic to your Kubernetes cluster, the issue could be in the Ingress resource, controller, DNS, service, or app itself
+
+1. Confirm Ingress Controller is Running
+Ingress objects do nothing without an Ingress controller.
+check if ingres related pods are running and install ingress controller if missing
+
+2. Check the Ingress Resource
+```bash
+kubectl describe ingress <ingress-name> -n <namespace>
+```
+Validate:
+   Host/path rules are correct
+   Correct backend service name and port
+   No misconfiguration in annotations (e.g., wrong nginx.ingress.kubernetes.io/rewrite-target)
+
+3. Verify DNS / External IP
+Get external IP of the ingress controller:
+```bash
+kubectl get svc -n ingress-nginx
+```
+and do nslookup <app.com> to check resolves to correct IP
+
+4. Check logs and events
+Ingress object events `kubectl describe ingress <name> -n <namespace>`
+ingress controller logs `kubectl logs <ingress-pod> -n ingress-nginx`
+
+## I have created a service object that is not mapped to a deployment. What could be the reason and how do you debug it?
+If you've created a Service object but it's not mapping to your Deployment, it usually means the Service can't find matching Pods.
+
+1. Check Service Selectors
+```bash
+kubectl get service <service-name> -o yaml
+```
+look for the selector section:
+
+```bash
+selector:
+  app: myapp
+  tier: backend
+```
+if labels don’t match, the Service can’t route to the Pods. Fix by:
+   Updating Deployment spec.template.metadata.labels
+   Or changing the Service’s selector
+
+2. Check Endpoints
+```bash
+kubectl get endpoints <service-name>
+```
+if ENDPOINTS show none then That means no pods match the Service selector. Fix it by aligning labels.
+
+3. Check the port configuration
+Mismatch between targetPort and containerPort won't break the Service, but traffic won’t reach the app.
+
+## One of your worker nodes is not joining the cluster. How would you debug the issue?
