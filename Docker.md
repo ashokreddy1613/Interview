@@ -112,6 +112,10 @@ Use **ENTRYPOINT** when your container is meant to run only one main process, li
 🔹 Use **CMD** to provide default options for that main command, like:
     Default flags, file paths, or environment settings
 
+ENTRYPOINT is fixed and always executed.
+CMD provides default arguments that can be overridden.
+
+
 ## Q21: How do you reduce the size of Dockerfile?
 
 I reduce Docker image size by:
@@ -246,3 +250,93 @@ spec:
         ports:
         - containerPort: 80
 ```
+
+## Q37 Docker Container Exits Immediately — Troubleshooting
+ would first inspect the container logs, verify the Dockerfile entrypoint or command, and check if the container runs a long-lived process. Often, containers exit if the main process completes or crashes
+
+ When a Docker container starts, it runs the command defined in CMD or ENTRYPOINT. If that process ends — whether successfully or due to an error — the container will exit.
+
+ Docker container must run a long-running foreground process. If it finishes or crashes, the container exits. Use docker logs, -it mode, and inspect CMD/ENTRYPOINT to debug such issues effectively."
+
+## Q38 What is the purpose of EXPOSE in Dockerfile?
+EXPOSE is a Dockerfile instruction used to indicate which port the containerized application will listen on at runtime. It serves as documentation and a signal to tools like Docker and Docker Compose, but it does not actually publish the port.
+The EXPOSE directive does not open the port to the outside world by itself. Instead, it tells Docker that the container is expected to listen on the specified port(s).
+
+To make a port accessible to the host or external clients, you still need to use the -p or --publish flag when running the container:
+
+## Q39 Port is Not Accessible on localhost even after Port mapping in Docker
+Publishing a port using -p (e.g., -p 8080:80) tells Docker to forward traffic from the host's port 8080 to the container's port 80.
+But if the app inside the container is listening only on localhost (127.0.0.1), it won’t accept traffic from outside — not even from the Docker port forwarding.
+
+✅ Fix
+Update the app to listen on 0.0.0.0, so it accepts connections from any interface within the container:
+
+`app.run(host='0.0.0.0', port=5000)`
+
+Now Docker can forward traffic correctly from your host to the container.
+
+## Q40 You made change in your code, rebuilt the image, but the change isn't reflected?
+This usually happens due to either build caching or the container using a volume that overrides the updated code. I’d verify that the image was rebuilt correctly and ensure no volume is masking the changes.
+
+🧱 1. Docker build cache
+Docker caches image layers to speed up builds. If no changes are detected in a layer’s context, it reuses the cached layer. This can skip the step that copies new code into the image.
+
+✅ Fix
+Use the --no-cache flag while building:
+
+```bash
+docker build --no-cache -t myapp:latest .
+```
+Also ensure that COPY instructions are placed after dependencies to avoid skipping due to unchanged upper layers.
+
+```bash
+# BAD: Code copied early, everything cached
+COPY . .
+
+# GOOD: Dependencies first, then app code
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+```
+"If Docker changes aren’t reflected, check for caching in docker build and make sure no local volumes are masking your image content."
+## Q41 App Crashes with "Permission Denied" in Container but works fine on localhost
+The likely cause is that the app or script lacks proper execution permissions in the container or is being run as a non-root user without access. I’d check file permissions and adjust the Dockerfile to ensure the user has necessary rights.
+
+## Q42 Docker host is running out of disk space. How do you clean up?
+I would use Docker system prune commands to clean up unused containers, images, volumes, and networks. Then, I’d investigate large files under Docker’s storage directory and implement a cleanup policy going forward.
+## Q43 How will you Debug a Live Container?
+1. Use docker exec to run commands inside the container
+```bash
+docker exec -it <container-id or name> /bin/sh
+
+docker exec -it myapp cat /var/log/app.log
+docker exec -it myapp env
+```
+🔌 2. Use docker logs to view container stdout/stderr
+```bash
+docker logs -f <container-id>
+
+```
+Useful for applications that log to console (e.g., Node.js, Python, Java Spring Boot).
+
+
+🧾 3. Use docker inspect for metadata and configuration
+```bash
+docker inspect <container-id>
+```
+You can retrieve:
+
+Mount points
+Network configuration
+Environment variables
+Command and image details
+👁️ 4. Use docker top to inspect running processes
+📊 5. Check network settings and connectivity
+```bash
+docker exec -it <container-id> netstat -tulnp
+docker exec -it <container-id> curl http://localhost:port
+```
+Useful for diagnosing port binding or DNS resolution issues inside the container.
+
+## Q44 When will you forcefully remove a container and how?
+Yes, I’ve had to forcefully remove containers when they were stuck in a dead or unresponsive state. I use the docker rm -f <container-id> command to do this.

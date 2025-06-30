@@ -680,3 +680,77 @@ If a pipeline consistently fails on Tuesdays without any code changes, that sugg
 ```
 "If a pipeline fails only on Tuesdays without code changes, I approach it as a temporal environment issue. I compare successful vs. failing runs, look for cron jobs, expiring tokens, rotating resources, or scheduled reboots. I reproduce the failure manually and add debug steps to isolate the root cause. These kinds of issues are often tied to external systems or overlooked automation triggers."
 
+## Q37 How to optimize jenkins pipline to reduce build time
+1. Use Parallel Execution
+Split independent steps into parallel stages:
+2. Avoid Unnecessary Builds
+Use when conditions to skip stages based on branch, changes, or env:
+
+## Q38 CI Pipeline Succeeds but App is Broken in Prod — What Action Will You Take?
+
+1. 🔥 Initiate Incident Response
+Notify the team. Document the issue.
+If user-facing and severe, consider triggering an automated rollback or manual redeploy of the last working version.
+2. 🧪 Check Prod Logs and Monitoring
+View logs using ELK, CloudWatch, or your observability stack.
+Check:
+HTTP status codes (500s, 4xx)
+Application logs
+Metrics: memory, CPU, DB errors, timeouts
+3. 🔁 Compare Staging and Production
+Is staging missing any:
+Environment variables?
+Backend services?
+Feature flags?
+Confirm the artifact promoted to prod is the same tested in staging.
+4. 🔐 Check Secrets and External Integrations
+API keys, third-party integrations, database credentials — misconfigured or rotated tokens can break production unexpectedly.
+5. 🧾 Check Infrastructure Differences
+Is production using a different:
+Kubernetes namespace?
+Load balancer config?
+Terraform state?
+Sometimes prod has older AMIs, different volumes, or a custom security group.
+
+## Q39 Pipeline Slows Down Over Time (Builds taking more time) — How Will You Fix?
+
+1. 📊 Measure Stage Durations Over Time
+Use CI tool metrics (Jenkins, GitHub Actions, GitLab) or integrate Prometheus/Grafana.
+Identify which stage(s) are consuming more time — code checkout, dependency resolution, test execution, build packaging, etc.
+2. 📦 Check Dependency Management
+Over time, dependency trees can grow.
+Use tools like:
+mvn dependency:analyze
+npm prune
+Cache dependencies (e.g., ~/.m2, node_modules) between runs to avoid full re-downloads.
+3. 💾 Enable Layered and Incremental Builds
+Avoid cleaning entire workspace unless necessary (mvn clean install can be expensive).
+Use incremental build options:
+Gradle: --build-cache
+Bazel: native caching
+Docker: use layers wisely and avoid invalidating cache
+4. 🧼 Clean Up Disk and Workspace
+Runners may accumulate:
+Gigabytes of build artifacts
+Old Docker images and volumes
+Use scheduled jobs or add cleanup logic:
+docker system prune -af
+5. 🚀 Use Parallelism and Matrix Builds
+Split long test suites or build steps using:
+strategy.matrix in GitHub Actions
+parallel stages in Jenkins pipelines
+6. ⚙️ Review Runner/Agent Resource Utilization
+Check CPU, memory, disk I/O on build agents.
+Use autoscaling runners or move to faster instance types if needed.
+
+🧠 Real-World Example
+We noticed our build time increased from 7 to 19 minutes over 6 months.
+Root cause:
+
+Increased number of tests without parallel execution
+Outdated Docker layers not using cache
+✅ Fixes implemented:
+
+Introduced parallel test stages
+Refactored Dockerfile to leverage cache better
+Cleaned up unused images on runners weekly
