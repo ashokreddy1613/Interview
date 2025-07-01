@@ -905,6 +905,124 @@ I’d deploy Prometheus with the kube-prometheus-stack, use ServiceMonitor and P
 ## Q76 What command will you give for view access for the cluster → READ in rolebinding.yaml file
 I would bind the built-in view ClusterRole to the user using a ClusterRoleBinding.
 
+
+## how to get static ip of k8 how to manage
+When you define a Kubernetes service with type: LoadBalancer, EKS (via the AWS Cloud Controller Manager) automatically:
+
+   Creates an AWS Network Load Balancer (NLB).
+   Provisions and attaches Elastic Network Interfaces (ENIs) to worker node subnets.
+   Assigns public IPs by default (unless otherwise specified).
+Annotations tell EKS to use NLB + custom EIP
+
+```bash
+service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+service.beta.kubernetes.io/aws-load-balancer-eip-allocations: "eipalloc-xxxxxxxx"
+```
+
+## How you are managing secrets in kubernetes
+1. Create a Secret (Base64-encoded)
+```bash
+kubectl create secret generic my-secret \
+  --from-literal=username=admin \
+  --from-literal=password=secret123
+```
+2. Using Secrets in Pods
+Mount as environment variables:
+```bash
+env:
+- name: DB_USER
+  valueFrom:
+    secretKeyRef:
+      name: my-secret
+      key: username
+```
+Also, you can use external secret tool like AWS secret manager, HashiCorp Vault.
+
+## What is the maximum time taken for a node to start after a failure or restart?
+The maximum time for a Kubernetes node to recover (after a failure or restart) depends on several factors, but typically it's around 3–5 minutes, though it can be optimized or extended.
+
+## What are the parameters are used for HPA in K8s?
+HPA can scale based on CPU, memory, custom metrics, or external metrics.
+
+1. CPU Utilization (default)
+Metric: resource.cpu.utilization
+2. Memory Utilization
+Not enabled by default — requires custom metrics adapter.
+3. Custom Metrics
+You can define application-level metrics (e.g., queue length, request latency).
+
+## What are labels and annotations?
+In Kubernetes, labels and annotations are two types of metadata that you can attach to objects (like Pods, Services, Deployments, etc.), but they serve different purposes.
+
+✅ Labels
+🔹 Purpose:
+Used to identify and group Kubernetes objects for: Selection, Querying
+
+✅ Annotations
+🔹 Purpose:
+Used to attach arbitrary non-identifying metadata to objects — mostly used by tools, controllers, or external systems. For example, ingress, prometheus
+
+
+## How to run 2 pods with one depending on another – how to set roles?
+In Kubernetes, pods are designed to be loosely coupled and scheduled independently, so we don't control the strict startup order. But when one pod depends on another — say, an application depending on a database — we manage this dependency using Services, readiness probes, and optionally init containers.
+
+I typically do the following:
+
+Deploy the backend pod (like a database) along with a Kubernetes Service, which provides a stable DNS name like db.
+
+Add a readiness probe to the DB pod to ensure it's only marked ready when it can accept connections (e.g., TCP on port 5432).
+
+Deploy the app pod, which connects to the DB via that service name (db:5432).
+
+Optionally, I use an initContainer in the app pod that waits until the DB is available before the main container starts.
+
+## What is CSI?
+CSI stands for Container Storage Interface — it is a standard API that allows Kubernetes (and other container orchestration systems) to dynamically provision and manage storage from a variety of storage backends (cloud, on-prem, etc.).
+
+
+## How to create a secret service account?
+First, I create the ServiceAccount:
+Then, I manually create a Secret of type kubernetes.io/service-account-token and link it to the ServiceAccount using an annotation:
+Kubernetes automatically populates the token in the secret.
+
+
+
+## ⁠How do we make a K8s cluster highly available?
+
+We're using AWS EKS, control plane is mamaged by AWS which is highly available and deployed acrros zonnes. 
+
+Others I would take care 
+1. Load Balancing
+We use an external load balancer (e.g., AWS ELB or HAProxy) in front of the control planes so clients can access the API server even if one goes down.
+
+2. Worker Node HA
+“We distribute workloads across multiple nodes and zones using labels, node affinity, and pod anti-affinity.”
+
+Use Deployments with multiple replicas
+
+Configure PodDisruptionBudgets (PDBs) and Horizontal Pod Autoscaling (HPA)
+3. Storage and Networking HA
+“For persistent storage, we use cloud-native replicated volumes (like AWS EBS with multi-AZ or EFS). For networking, we ensure the CNI is resilient and backed by a redundant underlay.”
+4. Cluster Auto Healing
+“We enable node auto-replacement and use tools like Cluster Autoscaler and kube-proxy monitoring. In cloud, managed services like EKS/GKE handle control plane recovery for us.”
+
+
+
+## in Kuberenets there are 10 worker nodes, I have to deploy tomcat on each pods , how will you achieve it
+To deploy Tomcat on each of the 10 Kubernetes worker nodes, the correct and Kubernetes-native way is to use a DaemonSet.
+
+A DaemonSet ensures exactly one Pod is scheduled on every node (or selected nodes)
+
+To run one instance of Tomcat per worker node, I use a Kubernetes DaemonSet. DaemonSets ensure that one pod runs on every node — ideal for uniform deployments like monitoring agents or edge services. In this case, each Tomcat pod runs on a separate node, ensuring load is distributed and availability is maintained per node."
+
+
+## i have an local laptop, I want to access my hosted website, what service will be used in K8s
+Since I'm running Kubernetes locally, the most practical way to expose my website is using a NodePort service. This allows me to access the application on my laptop through the node's IP and a high port like 30080. Alternatively, if I'm using Minikube, I can use the LoadBalancer type with minikube service to simulate a cloud-like load balancer and open the service in a browser."
+
+
+## How do you handle authentication for EKS clusters and store secrets securely in your environment?
+
+
 # Troubleshoot 
 
 ## In Kubernetes, if a pod is in a pending state, how do you troubleshoot?
@@ -1058,7 +1176,7 @@ kubectl top pods --all-namespaces
 4. I will apply resource request and limts
 
 ## Dns resolution failing,  pods cant communicate with services with dns name, how to trobleshoot?
-f DNS resolution is failing in your Kubernetes cluster — meaning pods can’t resolve service names like my-service.my-namespace.svc.cluster.local
+If DNS resolution is failing in your Kubernetes cluster — meaning pods can’t resolve service names like my-service.my-namespace.svc.cluster.local
 
 1. Verify the CoreDNS Pods Are Running
 CoreDNS handles DNS in most Kubernetes clusters (like EKS, GKE, self-hosted).
@@ -1102,7 +1220,7 @@ Describe ingress to check errors
 kubectl describe ingress <name>
 ```
 ## If k8s running stateful application, how would you ensure high availability?
-So for stateful apps, I use StatefulSets, persistent volumes, pod anti-affinity, and readiness probes to ensure data stability and node-level availability. I also set up backups and distribute workloads across zones to make the system resilient to both node and infrastructure failures."
+So for stateful apps, I use StatefulSets, persistent volumes, pod anti-affinity, and readiness probes to ensure data stability and node-level availability. I also set up backups and distribute workloads across zones to make the system resilient to both node and infrastructure failures.
 
 ## You cluster running fine, suddenly some pods are not able to communicate with services?
 1. Confirm the Scope of the Issue

@@ -286,7 +286,104 @@ Root volume (/var) filled up to 100% due to unrotated log files. The application
     Deployment success rate reached 100%
     Reduced rollout time by 40% 
 
-## How does SSL certs works
-## Check SSL certificate if it has gone corrupt and is working fine
-## What is SSL/TLS Handshake.
-## I've a client and remote machine, how do certs communicate b/w them
+## Tell me about a time you handled a failed deployment in production. How did you manage the team and stakeholders?
+We had a production deployment go wrong during a Friday evening release window. The app (a customer-facing dashboard) started throwing 500 errors shortly after the rollout. This affected real-time reporting, and stakeholders were already starting to reach out.
+Action Plan:
+
+1. Immediate Rollback
+First, I called for an immediate rollback using our automated deployment pipeline (via GitLab CI/CD). The rollback plan had already been documented, which helped reduce panic.
+
+2. Switched to "Incident Mode"
+I set up a war-room Zoom call with the core team: backend, DevOps, QA, and product. We followed our incident response protocol — assigned roles:
+
+    One person diagnosing logs
+    Another checking recent commits
+    One person focused on external comms (status page)
+3. Stakeholder Communication
+I kept stakeholders informed every 15–20 minutes via Slack:
+    Clear, concise updates
+    No technical jargon
+    Reassured them rollback was successful and user impact was minimal
+4. Root Cause and Fix
+Within an hour, we identified a serialization bug introduced by a recent model change. We added an extra validation step in CI and wrote a unit test specifically to catch that class of failure.
+
+
+## Can you describe a recent major incident you handled and how you resolved it?
+Incident Summary:
+About two months ago, we had a major outage in our production environment — our API layer became unresponsive due to a Redis cluster failure. This brought down multiple microservices and disrupted real-time features for end-users.
+
+1. Diagnosis Phase
+Detection:
+Our on-call alerting system (via PagerDuty and Prometheus) fired alerts for elevated latency and timeout rates. I was the incident commander on call that night.
+
+Initial Assessment:
+I joined the call, brought in the core team (platform, backend, and infra), and quickly narrowed it down to Redis — cluster nodes were stuck in a failover loop due to a misconfigured sentinel setup after a recent maintenance.
+
+2. 🧠 Resolution Steps
+Quick Isolation:
+We updated service configs to bypass Redis where possible (some services had fallback mechanisms) and rerouted traffic to a healthy zone to reduce impact.
+
+Redis Fix:
+Infra team manually stabilized the Redis cluster by restarting specific nodes and correcting sentinel configurations.
+
+Service Recovery:
+We did a rolling restart of dependent services to flush stale connections and monitored recovery metrics closely.
+
+We restored full service within 90 minutes, avoided data loss, and strengthened our incident handling and observability posture. The incident became a case study internally for structured response under pressure.
+
+## Explain a situation where you were responsible for reducing deployment time. What approach did you take?
+At my previous company, our production deployments were taking 25–30 minutes, mainly due to large Docker images, long test pipelines, and manual approval steps. It became a bottleneck, especially during incident fixes and hotpatches.
+
+Actions I Took
+
+1. Pipeline Profiling:
+I started by analyzing our CI/CD pipeline (GitHub Actions + AWS CodeDeploy). Broke it down into stages and identified the biggest delays:
+
+    Docker image build & push: 12 minutes
+    Integration tests: 8 minutes
+    Manual approval: variable delays
+
+2. Optimized Docker Images:
+
+    Replaced full OS base image (ubuntu) with alpine, reducing image size by 60%
+    Used multi-stage builds to separate build dependencies from runtime
+    Cached layers smartly to avoid full rebuilds every commit
+
+3. Test Parallelization:
+Split integration and unit tests to run in parallel using job matrix in jenkins. This shaved off 5–6 minutes.
+
+4. Automated Safe Approvals:
+For non-critical services, I implemented policy-based automatic approval if tests, lint, and vulnerability scans passed. Used Open Policy Agent (OPA) with GitHub Actions.
+
+Deployment Strategy Shift:
+Moved from rolling deployments to blue-green deployments using AWS ECS. This allowed quicker cutover and rollback with minimal user disruption.
+
+
+## You are asked to reduce infrastructure cost without compromising performance. How do you approach this challenge?
+1. Audit & Visibility
+Used AWS Cost Explorer and Datadog to identify top cost drivers by service, region, and usage.
+
+Found over-provisioned Kubernetes clusters, idle EC2 instances, and test environments running 24/7
+2. Right-Sizing Resources
+Analyzed CPU/memory utilization and downsized EC2 and EKS node groups.
+
+Implemented horizontal pod autoscaling in Kubernetes to scale only when needed.
+
+3. Spot & Savings Plans
+Migrated non-critical workloads (batch jobs, staging, CI/CD runners) to spot instances.
+
+Committed to 1-year Savings Plans for steady-state production workloads with predictable usage.
+
+4. Environment Lifecycle Management
+Added automation to shut down staging and dev environments outside business hours.
+
+Used Terraform and GitHub Actions to auto-destroy unused preview environments after inactivity (with opt-out tagging).
+
+5. Storage Optimization
+Cleaned up unused EBS volumes, old snapshots, and orphaned S3 buckets.
+
+Enabled S3 lifecycle policies for log storage and backups.
+
+## Describe how you handled a rollback situation during a major release. What went wrong, and what did you learn?
+## Can you share an experience where your automation strategy failed or caused problems? What was your corrective action?
+

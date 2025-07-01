@@ -361,8 +361,24 @@ Yes, I have implemented several automation solutions:
    - Automated testing
    - Zero-downtime deployments
    - Rollback procedures 
-
-## Write a shell script to find and delete all files in a directory that are older than 30 days.
-## Create a script to monitor the disk usage of a server. If usage exceeds 80%, log the details to a file and send an alert email.
 ## Write a script that renames all .txt files in a directory by appending the current date to the filename.
-## have you written any automation scripts in your daily tasks 
+```bash
+#!/bin/bash
+
+# Get current date in YYYY-MM-DD format
+current_date=$(date +%F)
+
+# Loop through all .txt files in the current directory
+for file in *.txt; do
+  # Skip if no .txt files are found
+  [ -e "$file" ] || continue
+
+  # Extract base name and extension
+  base="${file%.txt}"
+
+  # Rename the file with current date appended
+  mv "$file" "${base}_${current_date}.txt"
+done
+
+echo "Renamed all .txt files by appending the current date."
+```

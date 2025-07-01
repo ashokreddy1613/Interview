@@ -123,11 +123,3 @@ I handle CPU and disk alerts by combining real-time metrics collection, smart al
 
 ###  How can you create the extensions in Grafana
 o create an extension in Grafana, use the plugin development framework to build custom panels, data sources, or apps. Extensions are built using React/TypeScript and can optionally include backend logic in Go. They enhance Grafana's capabilities for custom visualizations and integrations.
-
-1) What is observability architecture? Can you explain it?- notAnswered
-2) 
-3) What is the difference between observability
-and monitoring?
-4) When we have logs, why we need trace?
-
-what is prometheus, grafana, promrtheuis setup,  monitoring etc 

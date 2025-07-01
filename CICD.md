@@ -754,3 +754,5 @@ Outdated Docker layers not using cache
 Introduced parallel test stages
 Refactored Dockerfile to leverage cache better
 Cleaned up unused images on runners weekly
+
+## I want my deployment to be implemented to specific workloads or regions, that update shouldn't go to other parts.

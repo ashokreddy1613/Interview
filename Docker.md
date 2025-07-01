@@ -123,6 +123,7 @@ I reduce Docker image size by:
 - Leveraging multi-stage builds
 - Cleaning up cache/temp files
 - Minimizing layers and build context
+also use.ignore file
 This results in faster builds, smaller attack surface, and efficient deployments.
 
 ## Q22: What is the difference between COPY and ADD command in Docker File?
@@ -252,13 +253,14 @@ spec:
 ```
 
 ## Q37 Docker Container Exits Immediately — Troubleshooting
- would first inspect the container logs, verify the Dockerfile entrypoint or command, and check if the container runs a long-lived process. Often, containers exit if the main process completes or crashes
+ I would first inspect the container logs, verify the Dockerfile entrypoint or command, and check if the container runs a long-lived process. Often, containers exit if the main process completes or crashes
 
  When a Docker container starts, it runs the command defined in CMD or ENTRYPOINT. If that process ends — whether successfully or due to an error — the container will exit.
 
  Docker container must run a long-running foreground process. If it finishes or crashes, the container exits. Use docker logs, -it mode, and inspect CMD/ENTRYPOINT to debug such issues effectively."
 
 ## Q38 What is the purpose of EXPOSE in Dockerfile?
+
 EXPOSE is a Dockerfile instruction used to indicate which port the containerized application will listen on at runtime. It serves as documentation and a signal to tools like Docker and Docker Compose, but it does not actually publish the port.
 The EXPOSE directive does not open the port to the outside world by itself. Instead, it tells Docker that the container is expected to listen on the specified port(s).
 
@@ -299,11 +301,13 @@ RUN pip install -r requirements.txt
 COPY . .
 ```
 "If Docker changes aren’t reflected, check for caching in docker build and make sure no local volumes are masking your image content."
+
 ## Q41 App Crashes with "Permission Denied" in Container but works fine on localhost
 The likely cause is that the app or script lacks proper execution permissions in the container or is being run as a non-root user without access. I’d check file permissions and adjust the Dockerfile to ensure the user has necessary rights.
 
 ## Q42 Docker host is running out of disk space. How do you clean up?
 I would use Docker system prune commands to clean up unused containers, images, volumes, and networks. Then, I’d investigate large files under Docker’s storage directory and implement a cleanup policy going forward.
+
 ## Q43 How will you Debug a Live Container?
 1. Use docker exec to run commands inside the container
 ```bash
@@ -340,3 +344,105 @@ Useful for diagnosing port binding or DNS resolution issues inside the container
 
 ## Q44 When will you forcefully remove a container and how?
 Yes, I’ve had to forcefully remove containers when they were stuck in a dead or unresponsive state. I use the docker rm -f <container-id> command to do this.
+
+## Docker compose
+Docker Compose is a tool used to define and manage multi-container Docker applications. It allows me to describe services, networks, and volumes in a single YAML file and start them all with a single command. It’s ideal for local development, testing, and CI workflows.
+
+Docker Compose lets you:
+
+  Define multiple containers (services) in one YAML file
+  Configure build context, ports, environment variables, volumes, networks
+  Start, stop, and manage the entire stack using:
+ ```bash
+  docker-compose up -d
+  docker-compose down
+  ```
+I use Docker Compose to spin up a full-stack environment locally — Nginx frontend, Node.js app, and Postgres DB. It allows the dev team to test everything end-to-end before deploying to Kubernetes or ECS
+
+## how your approach to do migration an app  from montholic to conterization 
+🔹 1. Assess the Monolith
+Understand the current architecture and dependencies:
+
+Identify components: web server, API, DB, background jobs
+
+2. Containerize the Monolith (Phase 1)
+Start with "lift and shift" using Docker:
+Write a Dockerfile for the full monolith
+Externalize configuration with environment variables
+Use Docker volumes for persistent data
+
+Run with docker-compose if DB or cache (e.g., Redis) is involved
+
+✅ Goal: Run the monolith inside a container without code changes
+
+3. Identify and Isolate Components (Phase 2)
+Break the monolith into microservices, such as:
+Frontend (React/Angular)
+Backend API (Node.js, Django, etc.)
+Auth service
+Database (in a separate container)
+You define separate Dockerfiles and services for each part.
+
+✅ Run locally with Docker Compose or deploy to ECS/Kubernetes
+
+4. Refactor for Statelessness and Scalability
+5. Implement CI/CD for Containers
+6. Deploy to Kubernetes (Optional, Advanced)
+
+We migrated a legacy Node.js app by first containerizing the full app, then gradually extracting the auth and order modules into separate services. We used Docker Compose locally, ECS for early deployments, and later moved to EKS for full-scale orchestration and auto-scaling."
+
+## How will you maintain your base image, vulnerability free?
+1. Use Official or Minimal Base Images
+Choose images like:  alpine, debian:slim, amazonlinux
+2. Pin Versions & Digest
+Always pin the image version (avoid latest)
+3. Run Image Scans Regularly
+
+I keep base images secure by using minimal, trusted sources, scanning them with tools like Trivy or ECR, rebuilding regularly, and enforcing CI/CD checks. This helps us avoid outdated dependencies and keeps containerized workloads resilient and compliant."
+
+## How do you pass environment variables during Docker build commands? 
+I pass environment variables during the Docker build using the --build-arg flag, which maps to ARG statements in the Dockerfile. This is useful for build-time variables like package versions or feature toggles.
+
+## what is docker overlay network
+A Docker overlay network is a virtual network that allows containers running on different Docker hosts (nodes) to communicate securely, as if they were on the same local network
+
+Create a newtwork and run containers attached to that network.
+
+## Docker app, after 6 months, you see some degredation in performace,, how do fix the issue?
+
+I will check memory leaks or resource constraints
+
+## Docker app running in prod, how do you check it doesn’t have any vulnerabilities
+I ensure my Docker app in production is vulnerability-free by scanning images using tools like Trivy and ECR scanning, integrating these checks into CI/CD, and monitoring runtime behavior. I also keep images updated, minimize base image footprint, and use security best practices to harden the environment.
+
+## How to troble shoot docker network issue? 
+ 1. Check Container’s Network Configuration
+ ```bash
+ docker inspect <container_id> | grep -A 10 NetworkSettings
+```
+Look for:
+Assigned IP address
+Network name/type
+Gateway and DNS settings
+
+2. List Available Docker Networks
+```bash
+docker network ls
+```
+Check if the container is attached to the correct network.
+3. Inspect the Specific Network
+```bash
+docker network inspect <network_name>
+```
+Confirms which containers are attached
+
+Shows subnet, gateway, and connected endpoints
+
+## What is none and why do we use it?
+none is a special Docker network driver that disables all networking for a container. When a container is run with the --network=none option, it has no access to the host network, other containers, or the internet. It’s completely isolated at the network level.
+
+## you have docker container running but not able to conenct to the internet?
+When a Docker container can't connect to the internet, I first check if it’s using a valid network mode like bridge, then test DNS and IP connectivity inside the container. I validate the Docker bridge network, confirm that IP forwarding is enabled on the host, and check firewall/NAT rules. I also look into proxy settings or restart Docker if needed
+
+## docker swarm vs compose
+Docker Compose and Docker Swarm are both used to manage multi-container applications, but they serve different purposes. Docker Compose is designed for running and managing containers on a single host, mainly for development and testing. Docker Swarm is a container orchestration tool that allows you to deploy and manage containers across a cluster of machines in production.

@@ -117,3 +117,9 @@ To resolve git conflicts automatically, you can use:
 2. Automated merge tools
 3. CI/CD pipeline conflict resolution scripts
 4. Git hooks for pre-merge conflict detection
+
+## Git submodules, what is their purpose
+Git submodules are a way to include and manage one Git repository as a subdirectory within another Git repository. They allow you to track an external project at a specific commit, making it easier to reuse shared code or libraries across multiple projects without copying or duplicating."
+
+## what is Stale branch.
+A stale branch in Git refers to a branch that hasn't been updated or used in a long time. It usually lags behind the main development branch (like main or master) and may contain outdated or obsolete code. Stale branches are often candidates for cleanup to keep the repository clean and maintainable.
