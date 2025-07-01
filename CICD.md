@@ -526,6 +526,51 @@ stage('Deploy') {
 }
 ```
 
+## Scenario 1: Restarting a Failed Build at a Specific Stage
+
+How can you configure a pipeline to restart from the failed stage instead of starting from the beginning?
+
+Use checkpointing with options { skipStagesAfterUnstable() } or a stage-level restartable flag.
+
+```bash
+
+pipeline {
+    options {
+        skipStagesAfterUnstable()
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make build'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'make test'
+            }
+        }
+    }
+}
+```
+## How can you ensure that a build runs only on specific agents with certain labels?
+
+Use a label in the agent section.
+```bash
+
+pipeline {
+    agent { label 'linux-agent' }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'build.sh'
+            }
+        }
+    }
+}
+```
+
+
+
 ## Q31: Jenkins is failing to push a Docker image to the registry. How do you troubleshoot?
 When Jenkins fails to push a Docker image to a registry (like AWS ECR, Docker Hub, or GitLab), I troubleshoot it methodically by checking authentication, permissions, network, and Docker image tagging."
 
