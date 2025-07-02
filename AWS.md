@@ -106,13 +106,13 @@ So, we have two public and two private subnets
 TTL (Time To Live) in DNS is a setting that tells how long a DNS resolver should cache a DNS record before querying the authoritative DNS server again.
 
 Flow:
-A user tries to access example.com
-Their local DNS resolver (e.g., ISP or OS cache) checks if it already has a cached record
-If not, it queries the authoritative name server for the DNS record (e.g., A record → IP)
-The record is returned with a TTL value, e.g., TTL = 300 (5 minutes)
-The resolver caches the record for 5 minutes
-Any future requests during this TTL will use the cached value
-After TTL expires, the resolver will query the DNS server again for a fresh record
+- A user tries to access example.com
+- Their local DNS resolver (e.g., ISP or OS cache) checks if it already has a cached record
+- If not, it queries the authoritative name server for the DNS record (e.g., A record → IP)
+- The record is returned with a TTL value, e.g., TTL = 300 (5 minutes)
+- The resolver caches the record for 5 minutes
+- Any future requests during this TTL will use the cached value
+- After TTL expires, the resolver will query the DNS server again for a fresh record
 
     This means: cache example.com → 192.168.1.10 for 300 seconds (5 min)
 
