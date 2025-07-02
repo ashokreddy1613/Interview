@@ -93,16 +93,16 @@ If a VM has only a private IP and no public access, I typically use a bastion ho
 Session Manager (For AWS EC2)
 In AWS, if SSM Agent is installed and IAM permissions are set, I use SSM Session Manager to connect to private instances without opening SSH ports
 
-13. Types of load balancers
+## 13. Types of load balancers
 1. ALB
 2. NLB
 3. GWLB
 
-14. How many NAT Gateways are needed for two public & two private subnets n a single VPC? Min & max?
+## 14. How many NAT Gateways are needed for two public & two private subnets n a single VPC? Min & max?
 So, we have two public and two private subnets
     one subnet is minimum but not enough as it not provide HA so have two private subnets in different Azs
 
-15. Explain TTL in DNS- how does it work, and when do we use it? Explain the Flow.
+## 15. Explain TTL in DNS- how does it work, and when do we use it? Explain the Flow.
 TTL (Time To Live) in DNS is a setting that tells how long a DNS resolver should cache a DNS record before querying the authoritative DNS server again.
 
 Flow:
