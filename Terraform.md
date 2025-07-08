@@ -1156,6 +1156,7 @@ run `terraform plan` to detect the deletion
 Terraform is designed to be declarative — if a resource is missing but still present in your .tf files, simply run:
 `terraform apply`
 Terraform will recreate the deleted resource exactly as defined.
+
 ## How will you connect your terraform environment from aws and implement CI/CD.
 In Jenkins, I set up Terraform to authenticate with AWS using stored credentials or IAM roles. I configure remote state in S3 with DynamoDB locking to avoid conflicts.
 The pipeline runs terraform init, plan, and optionally apply on the main branch, ensuring that infrastructure changes are reviewed and version-controlled.
@@ -1264,6 +1265,278 @@ terraform-project/
 
 
 ## What is terraform work space and how are you managing it.
-Terraform workspaces are used to manage multiple versions of the same infrastructure within a single Terraform configuration — commonly for environments like dev, staging, and prod. Each workspace has its own state file, which allows isolated deployments using the same code."
-## terraform uses real time issue we faced…what are the error u faced in terraform recently
+Terraform workspaces are used to manage multiple versions of the same infrastructure within a single Terraform configuration — commonly for environments like dev, staging, and prod. Each workspace has its own state file, which allows isolated deployments using the same code.
 
+## What are the terraform lifecycle policies
+
+In Terraform, lifecycle policies are special settings used inside a resource block to control how Terraform manages that resource — especially during apply, plan, destroy, and change operations.
+
+prevent_destroy- Prevents the resource from being destroyed
+create_before_destroy-	Ensures a new resource is created first before deleting the old one
+ignore_changes- Ignores changes to specific attributes (Terraform won’t re-apply them)
+
+## If changes have been made to an instance via the UI and you run terraform apply without first running terraform plan, what will happen? Will there be an error, and will it still execute?
+
+Terraform will not throw the error, it will detect the difference between current state and state file and will try to fix it .
+
+## i had created an resource manually, how to do you implement it through terraform
+1. Write the Terraform Configuration
+Manually define the resource in a .tf file using its correct structure and settings.
+2. Import the Resource into Terraform
+3. Run terraform plan and Update Your .tf File and do terrafrom apply.
+
+## Terraform architecture
+1. Terraform CLI (Command Line Tool)
+  You run terraform init, plan, apply, destroy, etc.
+  Loads .tf configuration files
+  Sends instructions to Terraform Core
+
+2. Terraform Core
+  Parses configs
+  Creates dependency graph
+  Compares desired state (from .tf) with current state (from state file and provider)
+  Outputs a plan, and applies changes via providers
+
+3. Terraform Providers
+  Plugins that translate Terraform instructions into API calls
+  Examples: hashicorp/aws, azurerm, google
+  Downloaded during terraform init
+
+4. State File (terraform.tfstate)
+  Stores the actual infrastructure metadata 
+  Used to track what’s deployed and detect changes
+  Can be local or remote (S3, Terraform Cloud, etc.)
+
+5. Modules
+  Reusable units of Terraform code (like functions)
+  Help break infrastructure into logical parts
+  Can be local or stored remotely (GitHub, Terraform Registry)
+
+## Terrafrom Modules 
+The module approach in Terraform — this is a foundational concept for writing clean, reusable, and scalable infrastructure code.
+
+Basic structure:
+```bash
+project/
+├── main.tf
+├── variables.tf
+├── terraform.tfvars
+└── modules/
+    └── ec2/
+        ├── main.tf
+        ├── variables.tf
+        └── outputs.tf
+```
+Step 2: Define the EC2 Resource in the Module
+📄 modules/ec2/main.tf
+```bash
+resource "aws_instance" "this" {
+  ami           = var.ami
+  instance_type = var.instance_type
+
+  tags = {
+    Name = var.name
+  }
+}
+```
+This defines the logic for launching one EC2 instance. It takes ami, instance_type, and name as parameters.
+
+Step 3: Define Variables for the Module
+📄 modules/ec2/variables.tf
+```bash
+variable "ami" {
+  description = "AMI ID to use"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+}
+
+variable "name" {
+  description = "Name tag for EC2"
+  type        = string
+}
+
+```
+These variables make the module flexible. You can pass different values when you call it from root.
+
+Step 4: Define Outputs (Optional)
+📄 modules/ec2/outputs.tf
+```bash
+output "public_ip" {
+  value = aws_instance.this.public_ip
+}
+```
+This allows the calling file (main.tf) to get the EC2’s public IP as an output.
+
+Step 5: Call the Module from Root
+📄 main.tf
+
+```bash
+provider "aws" {
+  region = var.region
+}
+
+module "web_server" {
+  source        = "./modules/ec2"
+  ami           = var.ami
+  instance_type = var.instance_type
+  name          = "WebServer"
+}
+```
+You're saying: "Use the logic from ./modules/ec2, and pass these values to it."
+
+Step 6: Define Global Variables in Root
+📄 variables.tf
+```bash
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "ami" {
+  description = "AMI for EC2"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "Instance type"
+  default     = "t2.micro"
+}
+```
+These are variables for the root module, passed into the EC2 module.
+
+Step 7: Provide Actual Values
+📄 terraform.tfvars
+```bash
+ami = "ami-0c02fb55956c7d316"
+```
+This file feeds real values into the variables (instead of hardcoding in main.tf).
+
+### Want another EC2 instance? Just add this in main.tf:
+
+```bash
+module "backup_server" {
+  source        = "./modules/ec2"
+  ami           = var.ami
+  instance_type = "t2.micro"
+  name          = "BackupServer"
+}
+```
+
+# Scenario based 
+
+## 1. Scenario: Zero-Downtime Deployment of an EC2 Instance
+Question: You need to update an EC2 instance’s AMI ID without downtime. Terraform wants to destroy and recreate the instance. How do you avoid downtime?
+
+Use Create Before Destroy in lifecycle rules:
+
+```bash
+
+resource "aws_instance" "example" {
+  ami           = var.ami_id
+  instance_type = "t3.micro"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+```
+This ensures the new instance is created before the old one is deleted.
+
+Alternatively, use an Auto Scaling Group (ASG) with rolling updates.
+
+## 2.Scenario: Handling Terraform Drift in Production
+Question: Your Terraform-managed AWS infrastructure was modified manually by another team. Terraform does not show changes, but the AWS console does. How do you detect and correct this?
+
+- Run terraform plan -refresh-only to detect drift without making changes.
+
+- Use terraform state list to inspect tracked resources.
+
+- If a resource is missing, re-import it:
+```bash
+terraform import aws_instance.example i-1234567890abcdef0
+```
+- If necessary, terraform apply to restore the expected configuration.
+
+## 3. Scenario: Enforcing Terraform Security Policies
+Question: Your company wants to ensure that only t2.micro instances are used to control AWS costs. How do you enforce this in Terraform?
+
+Answer:
+
+Use a Terraform validation rule in the variables.tf file to restrict instance types
+```bash
+
+variable "instance_type" {
+description = "AWS EC2 instance type"
+type        = string
+
+validation {
+condition     = contains(["t2.micro"], var.instance_type)
+error_message = "Only t2.micro instance type is allowed."
+}
+}
+```
+This prevents users from applying Terraform with non-approved instance types.
+
+## 4. Scenario: Terraform Apply Failure Due to API Rate Limits
+Question: You are creating 100+ AWS resources in a single terraform apply, but the process fails due to AWS API rate limits. How do you fix this?
+
+Answer:
+
+Use retry settings in the AWS provider:
+```bash
+provider "aws" {
+  region = "us-east-1"
+  max_retries = 5
+}
+```
+Use depends_on to stagger resource creation:
+```bash
+
+resource "aws_instance" "one" {
+  ami = "ami-123456"
+}
+
+resource "aws_instance" "two" {
+  ami       = "ami-123456"
+  depends_on = [aws_instance.one]
+}
+```
+Use Terraform Workspaces to split workloads.
+
+## Scenario: Handling Terraform State Locking Issues
+Question: Your team is using Terraform with remote state in S3. A team member’s Terraform run failed, leaving the state locked. How do you resolve this issue?
+
+Answer:
+
+Terraform automatically locks the state in DynamoDB when using terraform { backend "s3" { } }. If a lock persists, run:
+```bash
+
+terraform force-unlock <LOCK_ID>
+```
+Use terraform state list and terraform state show to verify the state before unlocking.
+
+## Scenario: Dynamic Resource Scaling with Terraform Modules
+Question: Your infrastructure requires different EC2 instance types based on environment (dev, prod). How can you dynamically assign instance types in a Terraform module?
+
+Answer:
+
+Use terraform.tfvars or a map inside variables.tf:
+```bash
+
+variable "instance_type_map" {
+  type = map(string)
+  default = {
+    dev  = "t2.micro"
+    prod = "t3.large"
+  }
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-123456"
+  instance_type = var.instance_type_map[var.environment]
+}
+```
+Pass environment = "prod" in Terraform variables to get the correct instance type.
