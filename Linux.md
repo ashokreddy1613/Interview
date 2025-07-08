@@ -442,3 +442,17 @@ else
 fi
 ```
 instal ipcalc 
+
+## Write shell script to reverse 56789
+```bash
+#!/bin/bash
+
+# Number to reverse
+number=56789
+
+# Reverse using rev command
+reversed=$(echo "$number" | rev)
+
+echo "Original: $number"
+echo "Reversed: $reversed"
+```

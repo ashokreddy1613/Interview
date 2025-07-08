@@ -123,3 +123,120 @@ Git submodules are a way to include and manage one Git repository as a subdirect
 
 ## what is Stale branch.
 A stale branch in Git refers to a branch that hasn't been updated or used in a long time. It usually lags behind the main development branch (like main or master) and may contain outdated or obsolete code. Stale branches are often candidates for cleanup to keep the repository clean and maintainable.
+
+## git cherrypick
+git cherry-pick is used to apply one or more specific commits from one branch onto your current branch — without merging the whole branch.
+
+***git cherry-pick <commit-hash>***
+
+## git stash
+git stash is used to temporarily set aside your uncommitted changes (both staged and unstaged) so you can work on something else (e.g., switch branches), and then bring them back later.
+```bash
+git stash  # Saves all modifications and restores your working directory to the last commit
+
+git stash apply # To apply and remove the stash in one step
+```
+## git fork vs git clone
+
+***git clone*** creates a local copy of an existing remote repository.
+
+- Downloads the entire history and branches
+- You can push to it only if you have write access
+- Used for personal or team repos you already have access to
+
+A ***fork*** is a server-side copy of a repository made under your account (on GitHub, GitLab, etc.)
+
+You do this by clicking "Fork" on GitHub
+
+Creates a new remote repo: https://github.com/your-username/original-repo
+
+## What is the purpose of the .git folder in a Git repository?
+The .git folder contains all the metadata, configuration, and object database Git needs to manage version control. It is what transforms an ordinary directory into a Git repository.
+Why It’s Important:
+Without the .git folder, your project is no longer a Git repository.
+If you delete or corrupt it, Git can no longer track changes.
+If you copy the .git folder into another directory, you essentially clone the repo without using a remote.
+
+## Git squash
+Git squash is a way to combine (or "squash") several commits into a single commit. It helps you keep your commit history clean and meaningful, especially before merging a feature branch.
+
+Use interactive rebase:
+
+```bash
+
+git checkout feature-branch
+git rebase -i main
+```
+Mark commits as squash or s except for the first one.
+
+## How do you remove a remote branch in Git?
+
+Answer: Use git push <remote-name> --delete <branch-name>.
+
+```bash
+
+git push origin --delete feature-branch
+```
+
+## Explain git stash apply vs git stash pop.
+
+git stash apply re-applies stashed changes but keeps them in the stash, while git stash pop applies and removes them from the stash.
+
+## What is the difference between git reset and git revert?
+
+git reset moves the branch pointer and changes history, while git revert creates a new commit to undo changes.
+
+## Explain shallow cloning in Git.
+
+Shallow cloning (-depth=1) clones only the latest history.
+```bash
+
+git clone --depth=1 https://github.com/repo.git
+```
+## How do you fix a commit with the wrong message after pushing?
+ ```bash
+ 
+ git commit --amend -m "New message"
+ git push --force
+ 
+ ```
+ ## How do you squash commits using Git?
+
+Use interactive rebase with git rebase -i HEAD~n and mark commits as squash.
+
+## Scenario 1: Undoing a Pushed Commit Without Affecting Other Users' History
+
+You pushed a faulty commit to a shared branch. How can you fix the mistake without rewriting history?
+
+Use git revert to create a new commit that negates the previous one.
+
+Example:
+```bash
+
+git revert <commit-hash>
+git push origin main
+```
+git revert creates a new commit that undoes the changes of the specified commit. This approach is safe for shared branches because it preserves the history.
+
+## Scenario 2: Accidental Deletion of a Branch
+
+You accidentally deleted a local branch. How do you recover it?
+
+If the branch has been pushed to the remote, you can fetch it. If not, find the commit hash in the reflog and recreate it.
+
+Example:
+```bash
+
+git reflog
+git checkout -b recovered-branch <commit-hash>
+```
+
+## Scenario 3: Resolving a Conflict While Rebasing
+
+During a rebase, you encounter conflicts. How do you resolve them and continue the rebase?
+```bash
+
+git status  # Shows conflicting files
+git add resolved-file.txt
+git rebase --continue
+```
