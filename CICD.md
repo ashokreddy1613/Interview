@@ -198,6 +198,16 @@ pipeline {
   }
 }
 ```
+### syntax of Cron Job
+```bash
+* * * * * command_to_run
+| | | | |
+| | | | └── Day of the week (0-7) (0 or 7 = Sunday)
+| | | └──── Month (1-12)
+| | └────── Day of the month (1-31)
+| └──────── Hour (0-23)
+└────────── Minute (0-59)
+```
 
 ## Q9: What security measures/tools you were taken in your CI/CD pipeline?
 
@@ -801,3 +811,169 @@ Refactored Dockerfile to leverage cache better
 Cleaned up unused images on runners weekly
 
 ## I want my deployment to be implemented to specific workloads or regions, that update shouldn't go to other parts.
+
+## what are the test/pre-submits when you raise PR
+A pre-submit is a set of automated checks or tests that run before your code is merged
+
+✅ Build- Ensures your code compiles/builds
+✅ Unit tests- Runs fast automated tests
+✅ Linting- Checks formatting and style
+✅ Security scan- Checks for secrets or vulnerabilities
+✅ Static analysis- Looks for code smells, bugs, etc.
+✅ Code coverage- Measures test coverage
+✅ License checks- Ensures license headers are present
+
+
+## what is free style, and pipeline
+1. Declarative Pipeline (Most Common)
+✅ Characteristics:
+Structured, readable syntax
+Uses pipeline {} block
+
+2. Scripted Pipeline (Advanced Use)
+✅ Characteristics:
+Full control using Groovy scripting
+Uses node {} blocks
+
+3. Multibranch Pipeline
+✅ Characteristics:
+Automatically creates pipelines for each branch
+Detects branches, PRs, and runs builds accordingly
+Uses a Jenkinsfile in each branch
+
+4. Pipeline with Shared Libraries
+Lets you define reusable logic in a shared Git repo
+Import functions/stages via @Library
+
+5. Freestyle Projects (aka Freestyle Jobs)
+✅ What it is:
+A Freestyle job is the oldest and simplest way to define builds in Jenkins. It's configured entirely through the Jenkins UI — no code needed.
+
+
+## what is agent
+In a Jenkins pipeline, the agent section defines where the pipeline (or a stage) should run — i.e., on which Jenkins node, executor, or Docker container.
+
+any- Run anywhere
+none- No default — define per stage
+label- Target a labeled node
+docker- Run in a Docker container
+
+## If the Jenkins pipeline runs but the build doesn’t happen, what possible issues could be causing it?
+If a Jenkins pipeline runs but the build doesn’t actually happen, the possible reason be like:
+- Missing or misconfigured build stage like no sh, script step or empty block
+- Wrong branch checkout which means pipeline runs but the source code isn't checkout
+- Build stage might be skipped satge
+- Pipeline Uses agent none and No Per-Stage Agent, no agent defined in build stage
+- Misconfigured build.gradle, pom.xml, etc.
+
+I will check the jenkins pipeline, console output and look errors.
+
+## What is the purpose of a webhook, and how is it used in a CI/CD pipeline?
+A webhook is a way for one system (e.g., GitHub, GitLab, Bitbucket) to notify another system (like Jenkins) about an event — instantly and automatically.
+
+Purpose of a Webhook in CI/CD is to trigger CI/CD pipelines automatically when code changes.
+Common Triggers via Webhooks:
+   - A push to a branch
+   - A pull request is opened or updated
+   - A tag or release is created
+   - A merge happens
+
+
+## How to find out memory leaks in cicd
+To implement Java memory leak detection in Jenkins, using heap dumps and Eclipse MAT
+Step 1: Add Heap Dump JVM Options
+In your build or test step, add these JVM options
+
+```bash
+sh 'MAVEN_OPTS="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./" mvn test'
+```
+Step 2: Capture and Archive the Heap Dump
+Update your Jenkinsfile to check for heap dump and archive it:
+
+```bash
+pipeline {
+    agent any
+
+    stages {
+        stage('Run Tests') {
+            steps {
+                sh 'MAVEN_OPTS="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./" mvn test'
+            }
+        }
+
+        stage('Check for Heap Dump') {
+            when {
+                expression { fileExists('heapdump.hprof') }
+            }
+            steps {
+                echo 'Heap dump detected — possible memory leak'
+                archiveArtifacts artifacts: 'heapdump.hprof', fingerprint: true
+            }
+        }
+    }
+}
+```
+Step 3: Analyze the Heap Dump
+After Jenkins run, download heapdump.hprof from the build artifacts
+Open it using Eclipse MAT locally
+Look for leak suspects or large retained objects
+
+
+## How do you use Jenkins shared libraries? Explain their typical structure and how they are integrated into your Jenkinsfiles.
+Jenkins Shared Libraries are reusable chunks of pipeline code written in Groovy, stored in a separate Git repository, and used across multiple Jenkins pipelines.
+
+A Shared Library is a Git repository (or part of one) that contains reusable Groovy code you can include in Jenkins pipelines using the @Library annotation.
+
+They help you:
+🧼 DRY (Don't Repeat Yourself)
+🛠 Centralize and standardize CI/CD logic
+📦 Share common stages, steps, or utilities between projects
+
+### How Do They Work?
+1. Create a Git repo with a specific structure (vars/, src/, etc.).
+```bash
+(shared-library-repo)
+├── vars/
+│   └── buildApp.groovy       # global function
+├── src/
+│   └── org/example/Utils.groovy  # reusable classes
+├── resources/
+│   └── templates/file.txt    # non-code files
+├── README.md
+```
+and define a global function:
+
+```bash
+def call() {
+    stage('Build') {
+        sh 'mvn clean install'
+    }
+    stage('Dockerize') {
+        sh 'docker build -t my-app .'
+    }
+}
+```
+
+2. Configure the library in Jenkins:
+   Go to Manage Jenkins → Global Pipeline Libraries.
+   Add your library by name and Git URL.
+
+3. In your Jenkinsfile, you load the library:
+   @Library('my-shared-library') _
+
+```bash
+@Library('my-shared-lib') _
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Use Shared Function') {
+            steps {
+                buildApp()
+            }
+        }
+    }
+}
+```
+4. Use global functions or classes defined in vars/ or src/.

@@ -382,3 +382,63 @@ done
 
 echo "Renamed all .txt files by appending the current date."
 ```
+
+## How to check the linux process
+***ps aux ***
+
+## Kernel logs are stored under which directory 
+📂 1. /var/log/ — Traditional Log Directory
+/var/log/kern.log (Debian/Ubuntu systems)
+
+## Linux Command to create softlink
+ln -s <target> <link_name>
+
+## Using sed command, how to remove first and last line of the file
+sed '1d; $d' filename
+
+## stdin, stdout, stderr in linux
+
+## How to fetch error from log files
+✅ 1. Use grep for error-related keywords
+```bash
+✅ 1. Use grep for error-related keywords
+```
+-i: case-insensitive (matches ERROR, Error, etc.)
+
+##  What is the Linux command used for mounting a file system?
+use mount to a file system
+```bash
+mount <device> <mount_point>
+```
+<device>: The block device (e.g., /dev/sdb1)
+
+<mount_point>: The directory where the filesystem will be attached (e.g., /mnt/data)
+
+## If you're unable to access linux machine, what you will do
+🔌 1. Check Network Reachability
+ping <ip-address>
+🚪 2. Check SSH Port Accessibility
+```bash
+telnet <ip-address> 22
+# or
+nc -zv <ip-address> 22
+```
+🔒 3. Check Credentials or SSH Key
+Confirm you’re using the correct username (ubuntu, ec2-user, root, etc.)
+Verify the private key file is correct:
+
+4. check VM is running
+
+
+## Write a script to find out if the provided IP is valid IPv4 or not
+```bash
+#!/bin/bash
+
+read -p "Enter IP: " ip
+if ipcalc "$ip" &>/dev/null; then
+    echo "Valid IPv4 address."
+else
+    echo "Invalid IPv4 address."
+fi
+```
+instal ipcalc 

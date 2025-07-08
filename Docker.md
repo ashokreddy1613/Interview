@@ -398,11 +398,15 @@ Choose images like:  alpine, debian:slim, amazonlinux
 Always pin the image version (avoid latest)
 3. Run Image Scans Regularly
 
-I keep base images secure by using minimal, trusted sources, scanning them with tools like Trivy or ECR, rebuilding regularly, and enforcing CI/CD checks. This helps us avoid outdated dependencies and keeps containerized workloads resilient and compliant."
+I keep base images secure by using minimal, trusted sources, scanning them with tools like Trivy or ECR, rebuilding regularly, and enforcing CI/CD checks. This helps us avoid outdated dependencies and keeps containerized workloads resilient and compliant.
 
+- An Alpine image is a minimal Docker base image built on Alpine Linux, a security-oriented, lightweight Linux distribution.
+- Slim is a debain , incluse morethan alphine image
 ## How do you pass environment variables during Docker build commands? 
 I pass environment variables during the Docker build using the --build-arg flag, which maps to ARG statements in the Dockerfile. This is useful for build-time variables like package versions or feature toggles.
-
+```bash
+docker build --build-arg MY_VAR=value -t my-image .
+```
 ## what is docker overlay network
 A Docker overlay network is a virtual network that allows containers running on different Docker hosts (nodes) to communicate securely, as if they were on the same local network
 
