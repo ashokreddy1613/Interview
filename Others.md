@@ -1,23 +1,26 @@
 ### What to do if an application is down
-Step 1: Confirm the Outage
+1: Confirm the Outage
     Is the issue real or user-specific?
     Try accessing the app via:
     UI (URL, app)
     curl or ping from CLI
     Check uptime monitor or alerting tools (e.g., Prometheus, New Relic, Datadog, ELK)
-Step 2: Check the Application Logs
+
+2: Check the Application Logs
 Logs are your first clue.
-Step 3: Check Service Status and Resource Health
+
+3: Check Service Status and Resource Health
     Is the app container running?
     Are pods healthy (in Kubernetes)?
     Any OOM, CrashLoopBackOff, or restarts?
-Step 4: Check Dependencies
+
+4: Check Dependencies
     Is the DB, Redis, external APIs, or Vault reachable?
     Is there a network issue, DNS issue, or certificate expiry?
-Step 5: Check Deployment/Release History
+5: Check Deployment/Release History
     Did someone deploy new code or config recently?
     Was there a recent infrastructure change (e.g., load balancer, secrets, volumes)?
-Step 6: Check Monitoring and Alerts
+6: Check Monitoring and Alerts
 
 If an application goes down, I start by confirming the outage through logs and monitoring tools. I check pod or service health, investigate recent deployments or configuration changes, and verify if any dependent services like databases or APIs are unreachable.
 
@@ -62,6 +65,7 @@ To enable passwordless SSH authentication between two Linux servers, I use SSH k
 Its a powerful pattern for zero-downtime deployment strategy where you maintain two identical environments:
 `Blue`: The current live/production environment
 `Green`: The new version of the application
+
 How it works:
 - Blue is live and serving producition workload
 - you create a exactly same env, and deploy new verions to GREEN
