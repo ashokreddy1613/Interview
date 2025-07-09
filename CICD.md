@@ -428,6 +428,7 @@ retry(3) {
 ## Q23: Describe how you would configure Jenkins to use multiple build agents for distributed builds.
 
 To configure Jenkins for distributed builds using multiple agents, I follow a master-agent architecture, where the controller manages job orchestration and offloads actual job execution to remote agents. 
+
 **✅ 1. Set Up Jenkins Controller (Master)**
 I install Jenkins on a central server and ensure it's properly secured.
 The controller handles:
