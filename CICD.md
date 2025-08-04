@@ -977,3 +977,48 @@ pipeline {
 }
 ```
 4. Use global functions or classes defined in vars/ or src/.
+
+## You notice that a Jenkins pipeline failed during the deployment stage. How would you troubleshoot and resolve the issue?
+- I will start by examining the pipeline console output to identify any specific error or failure message.
+- Then I would review the pipeline configuration including build step, environment variables, and plugin versions to determine the root cause.
+
+## After updating a Jenkins plugin, you encounter compatibility issues with existing pipelines. How would you handle this situation?
+- I would first check the release note nad docuentation of the updated plugin to understand any breaking changes oe compatibility issues.
+- If possible, I would roll back the plugin update to restore functionlity temporarily while investigating alternative solutions.
+
+## While triggering a Jenkins pipeline for a feature branch, you encounter a merge conflict with the main branch. How would you proceed to ensure successful pipeline execution?
+- I would resolve the merge conflicts in the feature branch by manually resolving conflicts or rebasing onto the latest changes from the main branch
+- Once the conflict is resolved, I would push changes to the remote repo and trigger jenkins pipeline again to verify succesful execution.
+
+## Your Jenkins pipeline fails during the Docker image build stage due to a dependency error. How would you address this issue?
+- I would review the associated build context and docker file to identify the missing or incorrect dependency
+- Then, I would update the Dockerfile or build configuration to include the necesary dependecies or resolve version conflicts.
+
+## Users report slow response times and intermittent failures when accessing Jenkins pipelines. How would you investigate and improve performance?
+- I would start by monitoring jenkins system metrics such as CPU utilization, memory usage, disk I/O, and network traffic to identify potential bottlenecks or resource constriants.
+- Then I would optimize jenkind configuration settings, such as executors , build queue management, and plugin usage to improve resoruce utilization and mitigate performance issue.
+- Additinally, I might consider scaling jenkins horizontally to hanlde increased worlkload demands.
+
+## Your Jenkins pipeline frequently downloads dependencies during build execution, leading to increased build times and network bandwidth usage. How would you optimize dependency management to improve build performance?
+- I would implement dependency caching mechanism such as  Maven or Gradle dependency to store and reuse dependencies across builds.
+- By configuring Jenkins agents or build containers to cache dependecnies locally, subsequent  builds can retrieve dependencies more quickly and reduce reliance on external repos.
+
+## Your organization requires compliance with regulatory standards and auditing of CI/CD activities in Jenkins pipelines. How would you implement compliance controls and audit logging?
+- I woulfd enable jenkins Audit trail plugin to capture and log CICD activities, including pipeline executions, user interactions, and configuration changes.
+
+- Additionally I would enforce RBAC 
+
+## Your Jenkins instance is critical to the CI/CD workflow, and downtime is not acceptable. How would you design a disaster recovery plan and ensure high availability for Jenkins?
+
+- I would deploy jenkins in a high-availability configuration using techniques like active -passive failover, load balancing, data replication across multiple nodes and data centres.
+
+- Additionally, I would implement regular backups of jenkins configuration, jobs, build artifacts to ensure data integrity.
+
+## Your team wants to implement a Blue/Green deployment strategy for rolling out application updates with zero downtime. How would you design and automate Blue/Green deployments in Jenkins?
+- I would use Jenkins Pipeline to define Blue/Green deployment stages, including provosining infra, deploying application artifacts and routing traffic between Blue and Green environments.
+- By leveraging tools like AWS Elastic Load Balancing or Kubernetes Ingress COntrollers, we can automate traffic switching and validation steps to ensure seamless and relaible deployment transitions.
+
+## Your pipeline encounters transient failures or intermittent issues during execution. How would you implement self-healing mechanisms to automatically recover from such failures
+
+- I would incorporate retry logic, error handling, and failure recovery mechanisms into jenkins pipelines using Groovy scripting or built-in pipeline features like catchError and retry.
+- 
