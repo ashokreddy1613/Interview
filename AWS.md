@@ -1380,3 +1380,75 @@ If some requests through an **AWS Application Load Balancer (ALB)** are failing 
     - CPU, memory, disk, etc. (check if the instance is overloaded)
 
 ### 13. What are the all the issues you had faced in your project, please explain
+
+## how do you access s3 in a Account from Account B
+There are two options to access
+
+Option1:
+Use Bucket Policy in Account A
+This is the simplest and most common way.
+
+📍 In Account A, add this policy to the S3 bucket:
+```bash
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowAccountBAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::<ACCOUNT_B_ID>:root"
+      },
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::my-data-bucket",
+        "arn:aws:s3:::my-data-bucket/*"
+      ]
+    }
+  ]
+}
+```
+
+✅ Option 2: Use IAM Role (Recommended for Fine-Grained Control)
+This is more secure and flexible — especially in production and enterprise environments.
+
+🔧 In Account A: Create a Role that Account B Can Assume
+1. Create an IAM Role in Account A
+    Name: CrossAccountS3AccessRole
+    Trusted entity:
+```bash
+{
+  "Effect": "Allow",
+  "Principal": {
+    "AWS": "arn:aws:iam::<ACCOUNT_B_ID>:root"
+  },
+  "Action": "sts:AssumeRole"
+}
+```
+2. Attach this policy to the role:
+```bash
+{
+  "Effect": "Allow",
+  "Action": [
+    "s3:ListBucket",
+    "s3:GetObject",
+    "s3:PutObject"
+  ],
+  "Resource": [
+    "arn:aws:s3:::my-data-bucket",
+    "arn:aws:s3:::my-data-bucket/*"
+  ]
+}
+```
+🔧 In Account B: Assume the Role
+
+```bash
+aws sts assume-role \
+  --role-arn arn:aws:iam::<ACCOUNT_A_ID>:role/CrossAccountS3AccessRole \
+  --role-session-name s3access
+```
+This returns temporary credentials (AccessKeyId, SecretAccessKey, SessionToken) that can be used to access the bucket.
