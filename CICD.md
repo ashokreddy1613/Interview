@@ -428,6 +428,7 @@ retry(3) {
 ## Q23: Describe how you would configure Jenkins to use multiple build agents for distributed builds.
 
 To configure Jenkins for distributed builds using multiple agents, I follow a master-agent architecture, where the controller manages job orchestration and offloads actual job execution to remote agents. 
+
 **✅ 1. Set Up Jenkins Controller (Master)**
 I install Jenkins on a central server and ensure it's properly secured.
 The controller handles:
@@ -977,6 +978,7 @@ pipeline {
 }
 ```
 4. Use global functions or classes defined in vars/ or src/.
+<<<<<<< HEAD
 
 ## You notice that a Jenkins pipeline failed during the deployment stage. How would you troubleshoot and resolve the issue?
 - I will start by examining the pipeline console output to identify any specific error or failure message.
@@ -1022,3 +1024,5 @@ pipeline {
 
 - I would incorporate retry logic, error handling, and failure recovery mechanisms into jenkins pipelines using Groovy scripting or built-in pipeline features like catchError and retry.
 - 
+=======
+>>>>>>> 70522e34407f3901090523be0cb4b494037f718f
